@@ -18,18 +18,18 @@ export function RecentTrades({ trades }: RecentTradesProps) {
   return (
     <div className="w-[45%] flex flex-col bg-white overflow-hidden">
       <div className="bg-brand-blue text-white p-2 text-center uppercase tracking-widest text-[10px] font-black border-b-[3px] border-black shadow-[0_2px_0_#000] z-10 relative">
-        Recent Trades (Khớp lệnh)
+        Recent Trades
       </div>
       <div className="flex bg-gray-200 border-b-[2px] border-black py-1 px-4 text-[10px] text-gray-500 uppercase z-10 relative">
         <span className="w-[30%] text-left">Time</span>
         <span className="w-[35%] text-center">Price</span>
         <span className="w-[20%] text-right">Vol</span>
-        <span className="w-[15%] text-right">M/B</span>
+        <span className="w-[15%] text-right">B/S</span>
       </div>
       <div ref={listRef} className="flex-1 overflow-y-auto custom-scrollbar flex flex-col p-2 gap-[2px] bg-white">
         {trades.map((trade, i) => {
-        // Vietnamese convention: M = Mua (Buy) = green, B = Bán (Sell) = red
-          const isMua = trade.side === 'M';
+        // B = Buy = green, S = Sell = red
+          const isMua = trade.side === 'B';
           const isNew = i === 0;
           return (
             <div

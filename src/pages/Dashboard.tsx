@@ -316,11 +316,11 @@ export function Dashboard() {
                         </td>
                         <td className="p-4 text-center font-black uppercase tracking-widest">
                            {isProfit ? (
-                             <span className="bg-brand-green border-[3px] border-black px-4 py-2 shadow-[2px_2px_0px_#000] text-black tracking-widest">THẮNG</span>
+                             <span className="bg-brand-green border-[3px] border-black px-4 py-2 shadow-[2px_2px_0px_#000] text-black tracking-widest">WIN</span>
                            ) : isNeutral ? (
-                             <span className="bg-gray-200 border-[3px] border-black px-4 py-2 shadow-[2px_2px_0px_#000] text-gray-600">HÒA</span>
+                             <span className="bg-gray-200 border-[3px] border-black px-4 py-2 shadow-[2px_2px_0px_#000] text-gray-600">BREAK EVEN</span>
                            ) : (
-                             <span className="bg-[#ff5f56] border-[3px] border-black px-4 py-2 shadow-[2px_2px_0px_#000] text-white tracking-widest">LỖ</span>
+                             <span className="bg-[#ff5f56] border-[3px] border-black px-4 py-2 shadow-[2px_2px_0px_#000] text-white tracking-widest">LOSS</span>
                            )}
                         </td>
                       </tr>

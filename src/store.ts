@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Ticket, Order, OrderStatus, NotificationItem } from './types';
+import type { Ticket, Order, OrderStatus, NotificationItem, Event } from './types';
 import { PLATFORM_FEE_RATE, SELL_TAX_RATE } from './types';
 import { fetchFloorPrice, fetchWalletTrades, recordTrade, type TradeRecord } from './api/backendApi';
 
@@ -11,6 +11,10 @@ interface AppState {
   // Navigation
   activePage: 'landing' | 'markets' | 'dashboard' | 'profile';
   setActivePage: (page: 'landing' | 'markets' | 'dashboard' | 'profile') => void;
+
+  // View States
+  viewingEvent: Event | null;
+  setViewingEvent: (event: Event | null) => void;
 
   // Wallet State
   isWalletConnected: boolean;
@@ -59,6 +63,9 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   activePage: 'landing',
   setActivePage: (page) => set({ activePage: page }),
+
+  viewingEvent: null,
+  setViewingEvent: (event) => set({ viewingEvent: event }),
 
   isWalletConnected: false,
   walletAddress: null,

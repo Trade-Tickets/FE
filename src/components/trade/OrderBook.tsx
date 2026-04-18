@@ -48,12 +48,12 @@ export function OrderBook({ eventId, selectedClass, currentStat, orders, isProfi
   return (
     <div className="w-[55%] flex flex-col border-r-[4px] border-black bg-white overflow-hidden">
       <div className="bg-brand-purple text-white p-2 text-center uppercase tracking-widest text-[10px] font-black border-b-[3px] border-black shadow-[0_2px_0_#000] z-10 relative">
-        Order Book (Độ sâu thị trường)
+        Order Book
       </div>
       <div className="flex bg-gray-200 border-b-[2px] border-black py-1 px-4 text-[10px] text-gray-500 uppercase z-10 relative">
         <span className="w-[25%] text-left">Vol</span>
-        <span className="w-[25%] text-center text-green-700 font-black">Giá Mua</span>
-        <span className="w-[25%] text-center text-red-700 font-black">Giá Bán</span>
+        <span className="w-[25%] text-center text-green-700 font-black">Bid</span>
+        <span className="w-[25%] text-center text-red-700 font-black">Ask</span>
         <span className="w-[25%] text-right">Vol</span>
       </div>
 

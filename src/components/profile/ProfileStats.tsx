@@ -70,26 +70,26 @@ export function ProfileStats({
 
         {/* Divider */}
         <div className="border-t-[3px] border-black border-dashed pt-3 mt-1">
-          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Thống kê giao dịch (BE)</p>
+          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Trade Statistics (BE)</p>
 
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-1 text-xs font-bold text-gray-600 uppercase">
-                <BarChart2 size={14} /> Tổng lệnh
+                <BarChart2 size={14} /> Total Orders
               </div>
               <span className="font-mono font-black text-base">{totalTrades}</span>
             </div>
 
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-1 text-xs font-bold text-green-700 uppercase">
-                <ArrowDownLeft size={14} /> Mua vào
+                <ArrowDownLeft size={14} /> Bought
               </div>
               <span className="font-mono font-black text-sm text-green-700">{totalBuyVolume.toFixed(4)} SUI</span>
             </div>
 
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-1 text-xs font-bold text-red-600 uppercase">
-                <ArrowUpRight size={14} /> Bán ra
+                <ArrowUpRight size={14} /> Sold
               </div>
               <span className="font-mono font-black text-sm text-red-600">{totalSellVolume.toFixed(4)} SUI</span>
             </div>

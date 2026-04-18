@@ -59,7 +59,7 @@ export function ProfileTradeHistory({ walletAddress }: ProfileTradeHistoryProps)
           <Clock size={24} /> Trade History
           {!error && trades.length > 0 && (
             <span className="ml-2 bg-brand-green border-[2px] border-black px-2 py-0.5 text-xs font-black">
-              {trades.length} lệnh
+              {trades.length} orders
             </span>
           )}
         </div>
@@ -76,17 +76,17 @@ export function ProfileTradeHistory({ walletAddress }: ProfileTradeHistoryProps)
       {error && hasFallback && (
         <div className="flex items-center gap-2 bg-yellow-50 border-[2px] border-yellow-400 p-3 mb-4 text-sm font-bold text-yellow-700">
           <AlertCircle size={16} />
-          Backend offline — hiển thị dữ liệu local (chưa đồng bộ)
+          Backend offline — displaying local data
         </div>
       )}
 
       {error && !hasFallback && (
         <div className="py-16 flex flex-col items-center gap-3 text-gray-400">
           <AlertCircle size={36} />
-          <p className="font-black uppercase">Không thể kết nối backend</p>
-          <p className="text-sm font-bold">Hãy đảm bảo BE đang chạy tại localhost:8080</p>
+          <p className="font-black uppercase">Cannot connect to backend</p>
+          <p className="text-sm font-bold">Ensure BE is running on localhost:8080</p>
           <button onClick={loadTrades} className="mt-2 bg-black text-white px-4 py-2 font-black border-[2px] border-black hover:opacity-80">
-            Thử lại
+            Retry
           </button>
         </div>
       )}
@@ -94,7 +94,7 @@ export function ProfileTradeHistory({ walletAddress }: ProfileTradeHistoryProps)
       {loading && (
         <div className="py-16 flex flex-col items-center gap-3 text-gray-400">
           <RefreshCw size={32} className="animate-spin" />
-          <p className="font-bold uppercase">Đang tải lịch sử giao dịch...</p>
+          <p className="font-bold uppercase">Loading trade history...</p>
         </div>
       )}
 
@@ -103,12 +103,12 @@ export function ProfileTradeHistory({ walletAddress }: ProfileTradeHistoryProps)
           <div className="border-[3px] border-black overflow-hidden">
             {/* Table Header */}
             <div className="flex bg-gray-100 border-b-[2px] border-black p-3 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-              <div className="flex-1">Sự kiện / Loại vé</div>
-              <div className="w-16 text-center">Loại</div>
-              <div className="w-20 text-right">Giá</div>
-              <div className="w-12 text-right">SL</div>
-              <div className="w-24 text-right">Tổng</div>
-              <div className="w-28 text-right text-[9px]">Thời gian</div>
+              <div className="flex-1">Event / Ticket Class</div>
+              <div className="w-16 text-center">Type</div>
+              <div className="w-20 text-right">Price</div>
+              <div className="w-12 text-right">Qty</div>
+              <div className="w-24 text-right">Total</div>
+              <div className="w-28 text-right text-[9px]">Time</div>
             </div>
 
             {/* Rows */}
@@ -151,7 +151,7 @@ export function ProfileTradeHistory({ walletAddress }: ProfileTradeHistoryProps)
                     </div>
                     <div className="w-16 text-center">
                       <span className={`px-1.5 py-0.5 border-[2px] border-black font-black text-[10px] uppercase ${isBuy ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        {isBuy ? 'Mua' : 'Bán'}
+                        {isBuy ? 'Buy' : 'Sell'}
                       </span>
                     </div>
                     <div className="w-20 text-right font-mono font-bold text-sm">{priceSui.toFixed(4)}</div>
@@ -177,7 +177,7 @@ export function ProfileTradeHistory({ walletAddress }: ProfileTradeHistoryProps)
                 onPageChange={(p) => setPage(p)} 
               />
               <span className="text-xs font-bold text-gray-500 text-center">
-                Trang {page + 1} / {totalPages} &nbsp;·&nbsp; {total} giao dịch
+                Page {page + 1} / {totalPages} &nbsp;·&nbsp; {total} trades
               </span>
             </div>
           )}
@@ -186,8 +186,8 @@ export function ProfileTradeHistory({ walletAddress }: ProfileTradeHistoryProps)
         !error && (
           <div className="py-16 flex flex-col items-center gap-3 text-gray-400">
             <Clock size={36} />
-            <p className="font-black uppercase">Chưa có giao dịch nào</p>
-            <p className="text-sm font-bold">Hãy mua hoặc bán vé để xem lịch sử tại đây</p>
+            <p className="font-black uppercase">No trades yet</p>
+            <p className="text-sm font-bold">Buy or sell tickets to see history here</p>
           </div>
         )
       ))}

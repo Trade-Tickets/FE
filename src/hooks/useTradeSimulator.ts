@@ -21,7 +21,7 @@ export interface TradeTick {
   time: string;
   price: number;
   volume: number;
-  side: 'B' | 'M'; // B = Buyer initiated, M = Market sell
+  side: 'B' | 'S'; // B = Buy, S = Sell
   priceChange: number; // change from prev trade
 }
 
@@ -79,7 +79,7 @@ function generateInitialTrades(basePrice: number, count: number = 30): TradeTick
     const volatility = basePrice * 0.012;
     const change = (Math.random() - 0.48) * volatility;
     price = Math.max(0.01, price + change);
-    const side: 'B' | 'M' = Math.random() > 0.45 ? 'M' : 'B'; // M=Mua, B=Bán
+    const side: 'B' | 'S' = Math.random() > 0.45 ? 'B' : 'S'; // B = Buy, S = Sell
     trades.push({
       id: `t-${ts}`,
       time: formatTime(new Date(ts)),
@@ -131,8 +131,8 @@ export function useTradeSimulator(basePrice: number, active: boolean = true): Si
       const newPrice = Math.max(0.01, parseFloat((priceRef.current + move).toFixed(4)));
 
       const isPriceUp = newPrice >= priceRef.current;
-      // Vietnamese convention: M = Mua (Buy), B = Bán (Sell)
-      const side: 'B' | 'M' = isPriceUp ? 'M' : 'B';
+      // B = Buy, S = Sell
+      const side: 'B' | 'S' = isPriceUp ? 'B' : 'S';
       const volume = Math.floor(Math.random() * 18 + 1) * 100;
 
       // New trade tick

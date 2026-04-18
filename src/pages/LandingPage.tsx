@@ -4,7 +4,7 @@ import { ArrowRight, Ticket as TicketIcon, Activity, Flame, ShieldCheck, Zap, Co
 import { EventExplorer } from '../components/EventExplorer';
 
 export function LandingPage() {
-  const { setActivePage } = useAppStore();
+  const { setActivePage, setViewingEvent } = useAppStore();
 
   return (
     <div className="min-h-screen bg-brand-bg text-black font-sans overflow-x-hidden selection:bg-brand-pink selection:text-white">
@@ -117,7 +117,10 @@ export function LandingPage() {
 
       {/* Live Markets Section */}
       <section className="bg-brand-bg border-b-[6px] border-black pb-12">
-        <EventExplorer onEventClick={() => setActivePage('markets')} />
+        <EventExplorer onEventClick={(event) => {
+          setViewingEvent(event);
+          setActivePage('markets');
+        }} />
       </section>
 
       {/* Features Section */}

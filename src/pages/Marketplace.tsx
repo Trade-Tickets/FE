@@ -12,13 +12,11 @@ import { AnimatePresence } from 'motion/react';
 import { useAppStore } from '../store';
 
 export function Marketplace() {
-  const [viewingEvent, setViewingEvent] = useState<Event | null>(null);
+  const { activePage, viewingEvent, setViewingEvent } = useAppStore();
   const [purchasingEvent, setPurchasingEvent] = useState<Event | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const { activePage } = useAppStore();
 
   const handleTradeComplete = () => {
     setIsCheckingOut(true);

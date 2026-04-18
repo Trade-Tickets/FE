@@ -1,30 +1,27 @@
-import { useState, useRef, useEffect } from 'react';
 import { useAppStore } from '../store';
+import { ConnectModal, useSuiClientQuery } from '@mysten/dapp-kit';
 import { Wallet, Loader2, Ticket as TicketIcon, Grid, User, Bell } from 'lucide-react';
-import { AccountDropdown } from './navbar/AccountDropdown';
 
 export function Navbar() {
-  const { isWalletConnected, walletAddress, connectWallet, cart, setCartOpen, activePage, setActivePage } = useAppStore();
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [isAccountOpen, setIsAccountOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { isWalletConnected, walletAddress, userOwnedTickets, cart, setCartOpen, activePage, setActivePage } = useAppStore();
+  // removed dropdown ref as we no longer use dropdown
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsAccountOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  // Để đổi sang USDC, bạn chỉ cần truyền thêm `coinType` vào API getBalance.
+  // Ví dụ USDC trên Testnet:
+  // const USDC_COIN_TYPE = '0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC';
+  
+  const { data: balanceData } = useSuiClientQuery(
+    'getBalance',
+    { 
+      owner: walletAddress!,
+      // Mở comment dòng dưới đây để fetch USDC thay vì SUI mặc định (0x2::sui::SUI)
+      // coinType: USDC_COIN_TYPE 
+    },
+    { enabled: !!walletAddress, refetchInterval: 10000 }
+  );
 
-  const handleConnect = async () => {
-    setIsConnecting(true);
-    await connectWallet();
-    setIsConnecting(false);
-  };
+  const suiCash = balanceData ? (Number(balanceData.totalBalance) / 1e9).toFixed(2) : '0.00';
+  const portfolioSui = userOwnedTickets.reduce((sum, ticket) => sum + ticket.priceSui, 0).toFixed(2);
 
   return (
     <nav className="flex items-center justify-between p-6 border-b-[4px] border-black bg-brand-bg sticky top-0 z-40">
@@ -97,16 +94,16 @@ export function Navbar() {
 
         {/* Connect Wallet / Account */}
         {isWalletConnected ? (
-          <div className="flex items-center gap-6" ref={dropdownRef}>
+          <div className="flex items-center gap-6">
             {/* Portfolio & Cash Stats */}
             <div className="hidden lg:flex items-center gap-6 border-r-[2px] border-gray-300 pr-6">
               <div className="flex flex-col items-start gap-0.5">
                 <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Portfolio</span>
-                <span className="text-[17px] font-black text-brand-green whitespace-nowrap">$120.50</span>
+                <span className="text-[17px] font-black text-brand-green whitespace-nowrap">{portfolioSui} SUI</span>
               </div>
               <div className="flex flex-col items-start gap-0.5">
-                <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Cash (USDC)</span>
-                <span className="text-[17px] font-black text-blue-600 whitespace-nowrap">$980.69 USDC</span>
+                <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Cash</span>
+                <span className="text-[17px] font-black text-blue-600 whitespace-nowrap">{suiCash} SUI</span>
               </div>
             </div>
 
@@ -125,27 +122,22 @@ export function Navbar() {
               </button>
 
               <button
-                onClick={() => setIsAccountOpen(!isAccountOpen)}
-                className="w-[42px] h-[42px] rounded-full sm:ml-2 bg-gradient-to-br from-[#f8bb46] to-[#fc5d4c] border-[3px] border-black shadow-[2px_2px_0px_#000] flex items-center justify-center text-white hover:scale-105 transition-transform cursor-pointer"
+                onClick={() => setActivePage('profile')}
+                className={`w-[42px] h-[42px] rounded-full sm:ml-2 border-[3px] border-black shadow-[2px_2px_0px_#000] flex items-center justify-center hover:scale-105 transition-transform cursor-pointer ${activePage === 'profile' ? 'bg-black text-white' : 'bg-gradient-to-br from-[#f8bb46] to-[#fc5d4c] text-white'}`}
               >
                 <User size={20} strokeWidth={2.5} />
               </button>
-
-              {/* Account Dropdown */}
-              {isAccountOpen && (
-                <AccountDropdown walletAddress={walletAddress} onClose={() => setIsAccountOpen(false)} />
-              )}
             </div>
           </div>
         ) : (
-          <button
-            onClick={handleConnect}
-            disabled={isConnecting}
-            className="px-6 py-2.5 bg-white text-black border-[3px] border-black font-bold text-sm flex items-center gap-2 neo-btn disabled:opacity-70 disabled:cursor-not-allowed uppercase hover:-translate-y-1 transition-transform"
-          >
-            {isConnecting ? <Loader2 className="animate-spin" size={18} /> : <Wallet size={18} />}
-            {isConnecting ? 'Connecting...' : 'Connect Wallet \u2192'}
-          </button>
+          <ConnectModal
+            trigger={
+              <button className="px-6 py-2.5 bg-white text-black border-[3px] border-black font-bold text-sm flex items-center gap-2 neo-btn uppercase hover:-translate-y-1 transition-transform">
+                <Wallet size={18} />
+                Connect Wallet &rarr;
+              </button>
+            }
+          />
         )}
       </div>
     </nav>

@@ -46,6 +46,10 @@ export interface Event {
 export type OrderType = 'buy' | 'sell';
 export type OrderStatus = 'open' | 'filled' | 'cancelled' | 'expired';
 
+// Fee constants
+export const PLATFORM_FEE_RATE = 0.001; // 0.1%
+export const SELL_TAX_RATE = 0.005;     // 0.5%
+
 export interface Order {
   id: string;
   eventId: string;
@@ -57,6 +61,9 @@ export interface Order {
   createdAt: number;
   expiresAt: number;
   avgBuyPrice?: number;
+  platformFee?: number;  // 0.1% on both buy/sell
+  sellTax?: number;      // 0.5% on sell only
+  totalCost?: number;    // total after fees
 }
 
 // --- Notification Types ---

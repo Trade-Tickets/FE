@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { Ticket, Order, OrderStatus, NotificationItem } from './types';
+import { PLATFORM_FEE_RATE, SELL_TAX_RATE } from './types';
 import { fetchFloorPrice } from './api/mockApi';
 
 interface AppState {
@@ -8,14 +9,12 @@ interface AppState {
   removeNotification: (id: string) => void;
 
   // Navigation
-  activePage: 'landing' | 'markets' | 'dashboard';
-  setActivePage: (page: 'landing' | 'markets' | 'dashboard') => void;
+  activePage: 'landing' | 'markets' | 'dashboard' | 'profile';
+  setActivePage: (page: 'landing' | 'markets' | 'dashboard' | 'profile') => void;
 
   // Wallet State
   isWalletConnected: boolean;
   walletAddress: string | null;
-  connectWallet: () => Promise<void>;
-  disconnectWallet: () => void;
 
   // Cart State (legacy/quick-buy)
   cart: Ticket[];
@@ -63,21 +62,6 @@ export const useAppStore = create<AppState>((set, get) => ({
   isWalletConnected: false,
   walletAddress: null,
 
-  connectWallet: async () => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        set({
-          isWalletConnected: true,
-          walletAddress: "0x7F5...c4B2"
-        });
-        resolve();
-      }, 1000);
-    });
-  },
-
-  disconnectWallet: () => {
-    set({ isWalletConnected: false, walletAddress: null });
-  },
 
   cart: [],
 
@@ -129,6 +113,16 @@ export const useAppStore = create<AppState>((set, get) => ({
           if (order.type === 'buy') {
             if (order.priceSui >= lowestAsk) {
               order.status = 'filled';
+
+              // Fee calculation: Platform fee 0.1%
+              const orderValue = order.priceSui * order.quantity;
+              const platformFee = orderValue * PLATFORM_FEE_RATE;
+              const totalCost = orderValue + platformFee;
+
+              order.platformFee = platformFee;
+              order.sellTax = 0;
+              order.totalCost = totalCost;
+
               for (let i = 0; i < order.quantity; i++) {
                 updatedTickets.push({
                   id: `TKT-MATCH-${Math.random().toString(36).substr(2, 5)}`,
@@ -138,33 +132,45 @@ export const useAppStore = create<AppState>((set, get) => ({
                   status: 'sold'
                 });
               }
-              get().addNotification(`Buy Order Filled at ${order.priceSui} SUI`, 'success');
+              get().addNotification(
+                `✅ Buy Filled: ${orderValue.toFixed(2)} SUI + ${platformFee.toFixed(4)} fee = ${totalCost.toFixed(4)} SUI`,
+                'success'
+              );
             } else {
               order.status = 'open';
               get().addNotification(`Buy Order Placed on Order Book`, 'info');
             }
           } else if (order.type === 'sell') {
-            if (order.priceSui <= highestBid) {
-              order.status = 'filled';
+            // SELL always fills — any price is accepted
+            order.status = 'filled';
 
-              const ticketsOfClass = updatedTickets.filter(t => t.eventId === order.eventId && t.ticketClass === order.ticketClass);
-              const totalSpend = ticketsOfClass.reduce((sum, t) => sum + t.priceSui, 0);
-              const avgBuyPrice = ticketsOfClass.length > 0 ? totalSpend / ticketsOfClass.length : order.priceSui;
-              order.avgBuyPrice = avgBuyPrice;
+            const ticketsOfClass = updatedTickets.filter(t => t.eventId === order.eventId && t.ticketClass === order.ticketClass);
+            const totalSpend = ticketsOfClass.reduce((sum, t) => sum + t.priceSui, 0);
+            const avgBuyPrice = ticketsOfClass.length > 0 ? totalSpend / ticketsOfClass.length : order.priceSui;
+            order.avgBuyPrice = avgBuyPrice;
 
-              let removedCount = 0;
-              updatedTickets = updatedTickets.filter(t => {
-                if (removedCount < order.quantity && t.eventId === order.eventId && t.ticketClass === order.ticketClass) {
-                  removedCount++;
-                  return false;
-                }
-                return true;
-              });
-              get().addNotification(`Sell Order Filled at ${order.priceSui} SUI`, 'success');
-            } else {
-              order.status = 'open';
-              get().addNotification(`Sell Order Placed on Order Book`, 'info');
-            }
+            // Fee calculation: Platform fee 0.1% + Sell tax 0.5%
+            const orderValue = order.priceSui * order.quantity;
+            const platformFee = orderValue * PLATFORM_FEE_RATE;
+            const sellTax = orderValue * SELL_TAX_RATE;
+            const netProceeds = orderValue - platformFee - sellTax;
+
+            order.platformFee = platformFee;
+            order.sellTax = sellTax;
+            order.totalCost = netProceeds;
+
+            let removedCount = 0;
+            updatedTickets = updatedTickets.filter(t => {
+              if (removedCount < order.quantity && t.eventId === order.eventId && t.ticketClass === order.ticketClass) {
+                removedCount++;
+                return false;
+              }
+              return true;
+            });
+            get().addNotification(
+              `✅ Sell Filled @ ${order.priceSui} SUI — Net: ${netProceeds.toFixed(4)} SUI (fee: ${platformFee.toFixed(4)} + tax: ${sellTax.toFixed(4)})`,
+              'success'
+            );
           }
 
           return {

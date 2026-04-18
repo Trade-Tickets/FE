@@ -3,6 +3,8 @@ import { X, Activity, TrendingUp, TrendingDown } from 'lucide-react';
 import { useAppStore } from '../store';
 import { useState } from 'react';
 import type { Event } from '../types';
+import { useSuiClientQuery } from '@mysten/dapp-kit';
+import { useSuiTrade } from '../hooks/useSuiTrade';
 
 // Sub-components
 import { PriceChart } from './trade/PriceChart';
@@ -17,8 +19,16 @@ interface TicketModalProps {
 }
 
 export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalProps) {
-  const { isWalletConnected, placeOrder, orders } = useAppStore();
+  const { isWalletConnected, walletAddress, placeOrder, orders, addNotification } = useAppStore();
   const [activeTab, setActiveTab] = useState<'buy' | 'sell'>('buy');
+  const { executeBuyOnChain, executeSellOnChain } = useSuiTrade();
+
+  const { data: balanceData } = useSuiClientQuery(
+    'getBalance',
+    { owner: walletAddress! },
+    { enabled: !!walletAddress, refetchInterval: 5000 }
+  );
+  const suiBalance = balanceData ? (Number(balanceData.totalBalance) / 1e9).toFixed(4) : '0.0000';
 
   if (!event) return null;
 
@@ -28,7 +38,47 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
   const isProfit = (currentStat?.change24h || 0) >= 0;
 
   const handleExecuteTrade = async (qty: number, price: number) => {
-    if (!isWalletConnected) return;
+    if (!isWalletConnected || !walletAddress) return;
+
+    const floorPrice = currentStat?.floorPrice || price;
+    const lowestAsk = floorPrice + 0.1;
+
+    // BUY: fills only if price >= lowestAsk
+    // SELL: ALWAYS fills at any price
+    const willFill = activeTab === 'sell' ? true : price >= lowestAsk;
+
+    if (willFill) {
+      try {
+        addNotification('⏳ Waiting for wallet signature...', 'info');
+
+        let txResult;
+        if (activeTab === 'buy') {
+          // Buy: send full cost (orderValue + 0.1% fee) on-chain
+          txResult = await executeBuyOnChain(walletAddress, price, qty);
+          addNotification(
+            `✅ Buy TX: ${txResult.txDigest.slice(0, 10)}... | -${txResult.netAmount.toFixed(4)} SUI`,
+            'success'
+          );
+        } else {
+          // Sell: send fees+tax on-chain (platform deducts, net proceeds returned later)
+          txResult = await executeSellOnChain(walletAddress, price, qty);
+          addNotification(
+            `✅ Sell TX: ${txResult.txDigest.slice(0, 10)}... | Fee+Tax: -${txResult.amountSpent.toFixed(4)} SUI`,
+            'success'
+          );
+        }
+      } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        if (errMsg.toLowerCase().includes('rejected') || errMsg.toLowerCase().includes('cancel') || errMsg.toLowerCase().includes('denied')) {
+          addNotification('❌ Transaction rejected by user', 'error');
+          return; // Stop completely if user rejected
+        }
+        // Network / gas error — warn but continue so local state still updates
+        addNotification(`⚠️ On-chain TX error (${errMsg.slice(0, 50)})`, 'error');
+      }
+    }
+
+    // Update local portfolio state
     await placeOrder({
       eventId: event.id,
       ticketClass: selectedClass,
@@ -36,6 +86,7 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
       priceSui: price,
       quantity: qty,
     });
+
     onPurchaseComplete();
   };
 
@@ -131,6 +182,7 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
             setActiveTab={setActiveTab}
             onExecuteTrade={handleExecuteTrade}
             defaultPrice={currentStat?.floorPrice || 50}
+            suiBalance={suiBalance}
           />
         </div>
       </motion.div>

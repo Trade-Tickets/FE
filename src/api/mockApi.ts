@@ -48,9 +48,9 @@ const EVENTS_DATA: Event[] = [
     tradingStatus: "Live",
     settlementDate: "2026-10-13",
     marketStats: [
-      { ticketClass: "Early Bird", originalPrice: 15, floorPrice: 45, change24h: 12.5, volume24h: "1.2K SUI", priceHistory: generateHistory(35, 5, 'up') },
-      { ticketClass: "Regular", originalPrice: 25, floorPrice: 30, change24h: -5.2, volume24h: "800 SUI", priceHistory: generateHistory(32, 2, 'down') },
-      { ticketClass: "VIP", originalPrice: 100, floorPrice: 250, change24h: 42.0, volume24h: "5.5K SUI", priceHistory: generateHistory(180, 15, 'up') }
+      { ticketClass: "Early Bird", originalPrice: 0.5, floorPrice: 1.2, change24h: 12.5, volume24h: "1.2K SUI", priceHistory: generateHistory(0.9, 0.15, 'up') },
+      { ticketClass: "Regular", originalPrice: 1.0, floorPrice: 0.85, change24h: -5.2, volume24h: "800 SUI", priceHistory: generateHistory(1.0, 0.08, 'down') },
+      { ticketClass: "VIP", originalPrice: 2.0, floorPrice: 3.5, change24h: 42.0, volume24h: "5.5K SUI", priceHistory: generateHistory(2.5, 0.3, 'up') }
     ]
   },
   {
@@ -68,8 +68,8 @@ const EVENTS_DATA: Event[] = [
     tradingStatus: "Live",
     settlementDate: "2026-11-18",
     marketStats: [
-      { ticketClass: "Regular", originalPrice: 50, floorPrice: 55, change24h: 2.1, volume24h: "400 SUI", priceHistory: generateHistory(52, 2, 'flat') },
-      { ticketClass: "VIP", originalPrice: 150, floorPrice: 140, change24h: -10.5, volume24h: "1.1K SUI", priceHistory: generateHistory(155, 8, 'down') }
+      { ticketClass: "Regular", originalPrice: 1.5, floorPrice: 1.8, change24h: 2.1, volume24h: "400 SUI", priceHistory: generateHistory(1.6, 0.1, 'flat') },
+      { ticketClass: "VIP", originalPrice: 3.0, floorPrice: 2.7, change24h: -10.5, volume24h: "1.1K SUI", priceHistory: generateHistory(3.0, 0.2, 'down') }
     ]
   },
   {
@@ -87,8 +87,8 @@ const EVENTS_DATA: Event[] = [
     tradingStatus: "Live",
     settlementDate: "2026-12-03",
     marketStats: [
-      { ticketClass: "Online Standard", originalPrice: 5, floorPrice: 8, change24h: 60.0, volume24h: "2.3K SUI", priceHistory: generateHistory(4, 1, 'up') },
-      { ticketClass: "In-Person Pass", originalPrice: 80, floorPrice: 110, change24h: 15.4, volume24h: "3.4K SUI", priceHistory: generateHistory(95, 5, 'up') }
+      { ticketClass: "Online Standard", originalPrice: 0.3, floorPrice: 0.5, change24h: 60.0, volume24h: "2.3K SUI", priceHistory: generateHistory(0.3, 0.05, 'up') },
+      { ticketClass: "In-Person Pass", originalPrice: 2.0, floorPrice: 2.8, change24h: 15.4, volume24h: "3.4K SUI", priceHistory: generateHistory(2.2, 0.15, 'up') }
     ]
   },
   {
@@ -106,7 +106,7 @@ const EVENTS_DATA: Event[] = [
     tradingStatus: "Live",
     settlementDate: "2027-02-10",
     marketStats: [
-      { ticketClass: "Hacker Pass", originalPrice: 10, floorPrice: 120, change24h: 300.0, volume24h: "15K SUI", priceHistory: generateHistory(80, 10, 'up') }
+      { ticketClass: "Hacker Pass", originalPrice: 0.8, floorPrice: 4.2, change24h: 300.0, volume24h: "15K SUI", priceHistory: generateHistory(2.5, 0.4, 'up') }
     ]
   },
   {
@@ -124,7 +124,7 @@ const EVENTS_DATA: Event[] = [
     tradingStatus: "Settled",
     settlementDate: "2027-03-18",
     marketStats: [
-      { ticketClass: "Gallery Entry", originalPrice: 20, floorPrice: 20, change24h: 0, volume24h: "0 SUI", priceHistory: generateHistory(20, 0.5, 'flat') }
+      { ticketClass: "Gallery Entry", originalPrice: 0.6, floorPrice: 0.6, change24h: 0, volume24h: "0 SUI", priceHistory: generateHistory(0.6, 0.02, 'flat') }
     ]
   },
   {
@@ -142,23 +142,23 @@ const EVENTS_DATA: Event[] = [
     tradingStatus: "Live",
     settlementDate: "2027-04-08",
     marketStats: [
-      { ticketClass: "Investor Pass", originalPrice: 500, floorPrice: 450, change24h: -10.0, volume24h: "2.5K SUI", priceHistory: generateHistory(480, 15, 'down') }
+      { ticketClass: "Investor Pass", originalPrice: 4.0, floorPrice: 3.5, change24h: -10.0, volume24h: "2.5K SUI", priceHistory: generateHistory(3.8, 0.2, 'down') }
     ]
   }
 ];
 
 const TICKETS_DATA: Ticket[] = [
-  { id: "t_101", eventId: "evt_1", ticketClass: "Early Bird", priceSui: 45, status: "available" },
-  { id: "t_102", eventId: "evt_1", ticketClass: "Regular", priceSui: 30, status: "available" },
-  { id: "t_103", eventId: "evt_1", ticketClass: "VIP", priceSui: 250, status: "available" },
-  { id: "t_104", eventId: "evt_1", ticketClass: "VIP", priceSui: 255, status: "listing" },
-  { id: "t_201", eventId: "evt_2", ticketClass: "Regular", priceSui: 55, status: "available" },
-  { id: "t_202", eventId: "evt_2", ticketClass: "VIP", priceSui: 140, status: "available" },
-  { id: "t_301", eventId: "evt_3", ticketClass: "Online Standard", priceSui: 8, status: "available" },
-  { id: "t_302", eventId: "evt_3", ticketClass: "In-Person Pass", priceSui: 110, status: "available" },
-  { id: "t_401", eventId: "evt_4", ticketClass: "Hacker Pass", priceSui: 120, status: "available" },
-  { id: "t_501", eventId: "evt_5", ticketClass: "Gallery Entry", priceSui: 20, status: "sold" },
-  { id: "t_601", eventId: "evt_6", ticketClass: "Investor Pass", priceSui: 450, status: "available" }
+  { id: "t_101", eventId: "evt_1", ticketClass: "Early Bird", priceSui: 1.2, status: "available" },
+  { id: "t_102", eventId: "evt_1", ticketClass: "Regular", priceSui: 0.85, status: "available" },
+  { id: "t_103", eventId: "evt_1", ticketClass: "VIP", priceSui: 3.5, status: "available" },
+  { id: "t_104", eventId: "evt_1", ticketClass: "VIP", priceSui: 3.6, status: "listing" },
+  { id: "t_201", eventId: "evt_2", ticketClass: "Regular", priceSui: 1.8, status: "available" },
+  { id: "t_202", eventId: "evt_2", ticketClass: "VIP", priceSui: 2.7, status: "available" },
+  { id: "t_301", eventId: "evt_3", ticketClass: "Online Standard", priceSui: 0.5, status: "available" },
+  { id: "t_302", eventId: "evt_3", ticketClass: "In-Person Pass", priceSui: 2.8, status: "available" },
+  { id: "t_401", eventId: "evt_4", ticketClass: "Hacker Pass", priceSui: 4.2, status: "available" },
+  { id: "t_501", eventId: "evt_5", ticketClass: "Gallery Entry", priceSui: 0.6, status: "sold" },
+  { id: "t_601", eventId: "evt_6", ticketClass: "Investor Pass", priceSui: 3.5, status: "available" }
 ];
 
 const COMMENTS_DATA: Record<string, Comment[]> = {
@@ -166,11 +166,11 @@ const COMMENTS_DATA: Record<string, Comment[]> = {
     {
       id: "c1", author: "0xKrypto",
       avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-      content: "Prices for this event are crazy right now! Anyone selling VIP passes under 20 SUI?",
+      content: "Prices for this event are pumping right now! Anyone selling VIP passes under 3 SUI?",
       timestamp: "2 hours ago", likes: 14,
       replies: [
-        { id: "c1-r1", author: "WhaleSui", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jack", content: "I'm dumping 5 VIPs if it hits 25 SUI. Hold your horses.", timestamp: "1 hour ago", likes: 3 },
-        { id: "c1-r2", author: "SuiApe", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ape", content: "Bro the floor is already at 28, you're dreaming 😂", timestamp: "45 mins ago", likes: 8,
+        { id: "c1-r1", author: "WhaleSui", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jack", content: "I'm dumping 5 VIPs if it hits 4 SUI. Hold your horses.", timestamp: "1 hour ago", likes: 3 },
+        { id: "c1-r2", author: "SuiApe", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ape", content: "Bro the floor is already at 3.5, you're dreaming 😂", timestamp: "45 mins ago", likes: 8,
           replies: [
             { id: "c1-r2-r1", author: "WhaleSui", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jack2", content: "Oops, haven't checked the board. Thanks for the alpha.", timestamp: "30 mins ago", likes: 2 }
           ]

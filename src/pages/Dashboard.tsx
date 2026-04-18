@@ -194,6 +194,8 @@ export function Dashboard() {
                   <th className="p-4 font-black uppercase tracking-widest border-r-[4px] border-black">Type</th>
                   <th className="p-4 font-black uppercase tracking-widest border-r-[4px] border-black text-right">Price</th>
                   <th className="p-4 font-black uppercase tracking-widest border-r-[4px] border-black text-right">Qty</th>
+                  <th className="p-4 font-black uppercase tracking-widest border-r-[4px] border-black text-right whitespace-nowrap">Fee</th>
+                  <th className="p-4 font-black uppercase tracking-widest border-r-[4px] border-black text-right whitespace-nowrap">Total</th>
                   <th className="p-4 font-black uppercase tracking-widest border-r-[4px] border-black whitespace-nowrap">Time</th>
                   <th className="p-4 font-black uppercase tracking-widest border-r-[4px] border-black">Status</th>
                   <th className="p-4 font-black uppercase tracking-widest text-center">Action</th>
@@ -225,6 +227,21 @@ export function Dashboard() {
                         </td>
                         <td className="p-4 font-mono font-bold text-right border-r-[4px] border-black text-lg">{order.priceSui.toFixed(2)} SUI</td>
                         <td className="p-4 font-mono font-bold text-right border-r-[4px] border-black text-lg">{order.quantity}</td>
+                        <td className="p-4 font-mono text-right border-r-[4px] border-black text-xs">
+                          {order.status === 'filled' ? (
+                            <div className="flex flex-col gap-0.5">
+                              <span>{(order.platformFee || 0).toFixed(4)}</span>
+                              {order.type === 'sell' && <span className="text-red-500">+{(order.sellTax || 0).toFixed(4)} tax</span>}
+                            </div>
+                          ) : <span className="text-gray-400">-</span>}
+                        </td>
+                        <td className="p-4 font-mono font-bold text-right border-r-[4px] border-black">
+                          {order.status === 'filled' ? (
+                            <span className={order.type === 'buy' ? 'text-red-600' : 'text-green-600'}>
+                              {order.type === 'buy' ? '-' : '+'}{(order.totalCost || 0).toFixed(4)}
+                            </span>
+                          ) : <span className="text-gray-400">-</span>}
+                        </td>
                         <td className="p-4 font-bold text-gray-500 text-sm border-r-[4px] border-black whitespace-nowrap">
                            {formatDistanceToNow(order.createdAt, { addSuffix: true })}
                         </td>

@@ -1,7 +1,8 @@
 import { motion } from 'motion/react';
-import { MOCK_EVENTS, Event } from '../mockData';
+import type { Event } from '../types';
+import { fetchEvents } from '../api/mockApi';
 import { Calendar, MapPin, Search, TrendingUp, TrendingDown } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 interface EventExplorerProps {
   onEventClick: (event: Event) => void;
@@ -12,9 +13,14 @@ const CATEGORIES = ["All", "Crypto", "Music", "Gaming", "Startup"];
 export function EventExplorer({ onEventClick }: EventExplorerProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    fetchEvents().then(setEvents);
+  }, []);
 
   const filteredEvents = useMemo(() => {
-    return MOCK_EVENTS.filter((event) => {
+    return events.filter((event) => {
       const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                             event.location.toLowerCase().includes(searchTerm.toLowerCase());
       
@@ -23,7 +29,7 @@ export function EventExplorer({ onEventClick }: EventExplorerProps) {
       
       return matchesSearch && matchesCategory;
     });
-  }, [searchTerm, selectedCategory]);
+  }, [searchTerm, selectedCategory, events]);
 
   return (
     <div className="w-full max-w-7xl mx-auto py-8 px-4 md:px-8">

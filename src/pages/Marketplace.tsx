@@ -7,7 +7,7 @@ import { CheckoutOverlay } from '../components/CheckoutOverlay';
 import { CartDrawer } from '../components/CartDrawer';
 // We don't need MyTicketsModal anymore since we have Dashboard
 import { Dashboard } from './Dashboard';
-import { Event } from '../mockData';
+import type { Event } from '../types';
 import { AnimatePresence } from 'motion/react';
 import { useAppStore } from '../store';
 
@@ -179,7 +179,6 @@ export function Marketplace() {
             ) : (
               <EventExplorer 
                 onEventClick={setViewingEvent} 
-                onBuyEvent={handleBuyIntent}
               />
             )}
           </section>

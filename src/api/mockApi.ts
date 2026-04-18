@@ -1,68 +1,38 @@
-export type TicketStatus = 'available' | 'sold' | 'listing';
-export type TicketClass = 'VIP' | 'Regular' | 'Early Bird' | 'Online Standard' | 'In-Person Pass' | 'Hacker Pass' | 'Gallery Entry' | 'Investor Pass' | string;
+// ========================================
+// Mock API Service
+// Simulates REST API calls with fetch-like async pattern.
+// When the real BE is ready, replace the body of each function
+// with actual fetch() calls — the signatures stay the same.
+// ========================================
 
-export interface Ticket {
-  id: string;
-  eventId: string;
-  ticketClass: TicketClass;
-  priceSui: number; // Purchase price
-  status: TicketStatus;
-}
+import type { Event, Ticket, Comment } from '../types';
 
-export interface MarketStat {
-  ticketClass: TicketClass;
-  originalPrice: number;
-  floorPrice: number;
-  change24h: number; // percentage, positive or negative
-  volume24h: string;
-  priceHistory: { time: string; price: number }[];
-}
-
-export interface Event {
-  id: string;
-  title: string;
-  coverImage: string;
-  location: string;
-  date: string;
-  time: string;
-  description: string;
-  about: string;
-  lineup: string[];
-  organizer: string;
-  tags: string[];
-  tradingStatus: "Live" | "Halted" | "Settled";
-  settlementDate: string;
-  marketStats: MarketStat[];
-}
-
-// Helper to generate fake price history
+// --- Helper: generate fake price history ---
 const generateHistory = (basePrice: number, volatility: number, trend: 'up' | 'down' | 'flat', dataPoints = 24) => {
   let currentPrice = basePrice;
   const history = [];
   const now = new Date();
-  
+
   for (let i = dataPoints; i >= 0; i--) {
-      // Add random walk
-      const randomShift = (Math.random() - 0.5) * volatility;
-      
-      // Add trend
-      let trendShift = 0;
-      if (trend === 'up') trendShift = volatility * 0.2;
-      if (trend === 'down') trendShift = -volatility * 0.2;
+    const randomShift = (Math.random() - 0.5) * volatility;
+    let trendShift = 0;
+    if (trend === 'up') trendShift = volatility * 0.2;
+    if (trend === 'down') trendShift = -volatility * 0.2;
 
-      currentPrice += randomShift + trendShift;
-      if (currentPrice < 1) currentPrice = 1; // Prevent negative SUI
+    currentPrice += randomShift + trendShift;
+    if (currentPrice < 1) currentPrice = 1;
 
-      const timePoint = new Date(now.getTime() - (i * 60 * 60 * 1000)); // Hourly data
-      history.push({
-          time: timePoint.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          price: Number(currentPrice.toFixed(2))
-      });
+    const timePoint = new Date(now.getTime() - (i * 60 * 60 * 1000));
+    history.push({
+      time: timePoint.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      price: Number(currentPrice.toFixed(2))
+    });
   }
   return history;
 };
 
-export const MOCK_EVENTS: Event[] = [
+// --- Raw mock data (private to this module) ---
+const EVENTS_DATA: Event[] = [
   {
     id: "evt_1",
     title: "Sui Builder House & Hackathon",
@@ -76,7 +46,7 @@ export const MOCK_EVENTS: Event[] = [
     organizer: "Mysten Labs",
     tags: ["CRYPTO", "HOUSE"],
     tradingStatus: "Live",
-    settlementDate: "2026-10-13", // Trading halts 2 days before
+    settlementDate: "2026-10-13",
     marketStats: [
       { ticketClass: "Early Bird", originalPrice: 15, floorPrice: 45, change24h: 12.5, volume24h: "1.2K SUI", priceHistory: generateHistory(35, 5, 'up') },
       { ticketClass: "Regular", originalPrice: 25, floorPrice: 30, change24h: -5.2, volume24h: "800 SUI", priceHistory: generateHistory(32, 2, 'down') },
@@ -122,7 +92,6 @@ export const MOCK_EVENTS: Event[] = [
     ]
   },
   {
-    // Keeping other events simple
     id: "evt_4",
     title: "Devcon 8 - Global Hacker Space",
     coverImage: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2070&auto=format&fit=crop",
@@ -178,27 +147,84 @@ export const MOCK_EVENTS: Event[] = [
   }
 ];
 
-export const MOCK_TICKETS: Ticket[] = [
-  // Tickets for Event 1 (Trading at Floor)
+const TICKETS_DATA: Ticket[] = [
   { id: "t_101", eventId: "evt_1", ticketClass: "Early Bird", priceSui: 45, status: "available" },
   { id: "t_102", eventId: "evt_1", ticketClass: "Regular", priceSui: 30, status: "available" },
   { id: "t_103", eventId: "evt_1", ticketClass: "VIP", priceSui: 250, status: "available" },
   { id: "t_104", eventId: "evt_1", ticketClass: "VIP", priceSui: 255, status: "listing" },
-  
-  // Tickets for Event 2
   { id: "t_201", eventId: "evt_2", ticketClass: "Regular", priceSui: 55, status: "available" },
   { id: "t_202", eventId: "evt_2", ticketClass: "VIP", priceSui: 140, status: "available" },
-
-  // Tickets for Event 3
   { id: "t_301", eventId: "evt_3", ticketClass: "Online Standard", priceSui: 8, status: "available" },
   { id: "t_302", eventId: "evt_3", ticketClass: "In-Person Pass", priceSui: 110, status: "available" },
-
-  // Tickets for Event 4
   { id: "t_401", eventId: "evt_4", ticketClass: "Hacker Pass", priceSui: 120, status: "available" },
-  
-  // Tickets for Event 5
   { id: "t_501", eventId: "evt_5", ticketClass: "Gallery Entry", priceSui: 20, status: "sold" },
-  
-  // Tickets for Event 6
   { id: "t_601", eventId: "evt_6", ticketClass: "Investor Pass", priceSui: 450, status: "available" }
 ];
+
+const COMMENTS_DATA: Record<string, Comment[]> = {
+  "evt_1": [
+    {
+      id: "c1", author: "0xKrypto",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
+      content: "Prices for this event are crazy right now! Anyone selling VIP passes under 20 SUI?",
+      timestamp: "2 hours ago", likes: 14,
+      replies: [
+        { id: "c1-r1", author: "WhaleSui", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jack", content: "I'm dumping 5 VIPs if it hits 25 SUI. Hold your horses.", timestamp: "1 hour ago", likes: 3 },
+        { id: "c1-r2", author: "SuiApe", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ape", content: "Bro the floor is already at 28, you're dreaming 😂", timestamp: "45 mins ago", likes: 8,
+          replies: [
+            { id: "c1-r2-r1", author: "WhaleSui", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jack2", content: "Oops, haven't checked the board. Thanks for the alpha.", timestamp: "30 mins ago", likes: 2 }
+          ]
+        }
+      ]
+    },
+    { id: "c2", author: "NFT_Degen", avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=0x888", content: "Is this event going to have a token airdrop for attendees? Rumors say yes.", timestamp: "5 hours ago", likes: 42 }
+  ]
+};
+
+// ========================================
+// Public API Functions
+// ========================================
+
+/** Simulated network delay */
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+/** GET /api/events */
+export async function fetchEvents(): Promise<Event[]> {
+  await delay(300);
+  return structuredClone(EVENTS_DATA);
+}
+
+/** GET /api/events/:id */
+export async function fetchEventById(eventId: string): Promise<Event | null> {
+  await delay(150);
+  const event = EVENTS_DATA.find(e => e.id === eventId);
+  return event ? structuredClone(event) : null;
+}
+
+/** GET /api/tickets?eventId=xxx */
+export async function fetchTicketsByEvent(eventId: string): Promise<Ticket[]> {
+  await delay(200);
+  return structuredClone(TICKETS_DATA.filter(t => t.eventId === eventId));
+}
+
+/** GET /api/events/:id/comments */
+export async function fetchComments(eventId: string): Promise<Comment[]> {
+  await delay(250);
+  return structuredClone(COMMENTS_DATA[eventId] || []);
+}
+
+/** POST /api/events/:id/comments */
+export async function postComment(eventId: string, comment: Comment): Promise<Comment> {
+  await delay(200);
+  if (!COMMENTS_DATA[eventId]) COMMENTS_DATA[eventId] = [];
+  COMMENTS_DATA[eventId].unshift(comment);
+  return structuredClone(comment);
+}
+
+/** GET /api/market/floor-price  – used by matching engine */
+export async function fetchFloorPrice(eventId: string, ticketClass: string): Promise<number> {
+  await delay(50);
+  const event = EVENTS_DATA.find(e => e.id === eventId);
+  const stat = event?.marketStats?.find(s => s.ticketClass === ticketClass);
+  return stat?.floorPrice || 50;
+}

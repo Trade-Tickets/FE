@@ -1,12 +1,19 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useAppStore } from '../store';
 import { X, QrCode, ArrowRightLeft, TrendingUp, TrendingDown } from 'lucide-react';
-import { MOCK_EVENTS } from '../mockData';
+import { fetchEvents } from '../api/mockApi';
+import type { Event } from '../types';
+import { useState, useEffect } from 'react';
 
 export function MyTicketsModal() {
   const { userOwnedTickets, isMyTicketsOpen, setMyTicketsOpen } = useAppStore();
+  const [events, setEvents] = useState<Event[]>([]);
 
-  const getEventForTicket = (eventId: string) => MOCK_EVENTS.find(e => e.id === eventId);
+  useEffect(() => {
+    fetchEvents().then(setEvents);
+  }, []);
+
+  const getEventForTicket = (eventId: string) => events.find(e => e.id === eventId);
 
   return (
     <AnimatePresence>

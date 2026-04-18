@@ -1,14 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '../store';
-import { MOCK_EVENTS } from '../mockData';
+import type { Event } from '../types';
+import { fetchEvents } from '../api/mockApi';
 import { QrCode, ArrowRightLeft, TrendingUp, TrendingDown, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 export function Dashboard() {
   const { userOwnedTickets, orders, cancelOrder } = useAppStore();
-  const [activeTab, setActiveTab] = useState<'vault' | 'orders'>('orders');
+  const visibleOrders = orders.filter(o => o.status !== 'expired');
+  const [activeTab, setActiveTab] = useState<'vault' | 'orders' | 'analytics'>('vault');
+  const [events, setEvents] = useState<Event[]>([]);
 
-  const getEventForTicket = (eventId: string) => MOCK_EVENTS.find(e => e.id === eventId);
+  useEffect(() => {
+    fetchEvents().then(setEvents);
+  }, []);
+
+  const getEventForTicket = (eventId: string) => events.find(e => e.id === eventId);
 
   // Aggregate tickets by eventId and ticketClass
   const groupedVault = userOwnedTickets.reduce((acc, ticket) => {
@@ -30,12 +37,41 @@ export function Dashboard() {
 
   const aggregatedTickets = Object.values(groupedVault);
 
+  // Account Overview Calc
+  const totalInvested = aggregatedTickets.reduce((acc, g) => acc + g.totalSpend, 0);
+  const currentEstValue = aggregatedTickets.reduce((acc, g) => {
+    const event = getEventForTicket(g.eventId);
+    const marketStat = event?.marketStats.find(s => s.ticketClass === g.ticketClass);
+    return acc + ((marketStat?.floorPrice ?? (g.totalSpend / g.count)) * g.count);
+  }, 0);
+  const totalUnrealizedPnL = currentEstValue - totalInvested;
+  const isTotalProfit = totalUnrealizedPnL >= 0;
+
   return (
     <div className="pt-8 pb-20 px-4 md:px-8 max-w-7xl mx-auto flex flex-col gap-8 min-h-[80vh]">
+      {/* Account Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
+         <div className="bg-brand-purple p-6 border-[4px] border-black shadow-[6px_6px_0px_#000] hover:translate-x-1 hover:translate-y-1 transition-transform">
+            <p className="font-black uppercase tracking-widest text-sm mb-2">Total Est. Value</p>
+            <h2 className="text-4xl font-black">{currentEstValue.toFixed(2)} SUI</h2>
+         </div>
+         <div className="bg-brand-blue p-6 border-[4px] border-black shadow-[6px_6px_0px_#000] hover:translate-x-1 hover:translate-y-1 transition-transform">
+            <p className="font-black uppercase tracking-widest text-sm mb-2">Total Invested (Cost)</p>
+            <h2 className="text-4xl font-black">{totalInvested.toFixed(2)} SUI</h2>
+         </div>
+         <div className={`p-6 border-[4px] border-black shadow-[6px_6px_0px_#000] hover:translate-x-1 hover:translate-y-1 transition-transform ${isTotalProfit ? 'bg-brand-green' : 'bg-[#ff5f56] text-white'}`}>
+            <p className="font-black uppercase tracking-widest text-sm mb-2">Unrealized PnL</p>
+            <div className="flex items-center gap-2">
+               <h2 className="text-4xl font-black">{isTotalProfit ? '+' : ''}{totalUnrealizedPnL.toFixed(2)} SUI</h2>
+               {isTotalProfit ? <TrendingUp size={32} /> : <TrendingDown size={32} />}
+            </div>
+         </div>
+      </div>
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b-[4px] border-black pb-6">
         <div>
           <h1 className="text-5xl md:text-6xl font-black uppercase tracking-tighter mix-blend-hard-light mb-2">
-            Overview
+            Dashboard
           </h1>
           <p className="font-bold text-xl text-gray-600 bg-brand-yellow inline-block px-3 py-1 border-[2px] border-black shadow-[2px_2px_0px_#000]">
             Asset Portfolio & Trade History
@@ -45,16 +81,23 @@ export function Dashboard() {
         <div className="flex bg-white border-[4px] border-black shadow-[6px_6px_0px_#000] overflow-hidden">
           <button 
             onClick={() => setActiveTab('vault')}
-            className={`px-8 py-4 font-black uppercase tracking-widest transition-colors ${activeTab === 'vault' ? 'bg-black text-white' : 'hover:bg-gray-200'}`}
+            className={`px-6 py-4 font-black uppercase tracking-widest transition-colors ${activeTab === 'vault' ? 'bg-black text-white' : 'hover:bg-gray-200'}`}
           >
             My Vault
           </button>
           <div className="w-[4px] bg-black"></div>
           <button 
             onClick={() => setActiveTab('orders')}
-            className={`px-8 py-4 font-black uppercase tracking-widest transition-colors ${activeTab === 'orders' ? 'bg-black text-white' : 'hover:bg-gray-200'}`}
+            className={`px-6 py-4 font-black uppercase tracking-widest transition-colors ${activeTab === 'orders' ? 'bg-black text-white' : 'hover:bg-gray-200'}`}
           >
-             Order History
+             Orders
+          </button>
+          <div className="w-[4px] bg-black"></div>
+          <button 
+            onClick={() => setActiveTab('analytics')}
+            className={`px-6 py-4 font-black uppercase tracking-widest transition-colors ${activeTab === 'analytics' ? 'bg-black text-white' : 'hover:bg-gray-200'}`}
+          >
+             Trade PnL
           </button>
         </div>
       </div>
@@ -157,17 +200,17 @@ export function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {orders.length === 0 ? (
+                {visibleOrders.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="p-12 text-center font-bold text-gray-500 uppercase tracking-widest">
                       No order history found.
                     </td>
                   </tr>
                 ) : (
-                  orders.map((order, idx) => {
+                  visibleOrders.map((order, idx) => {
                     const event = getEventForTicket(order.eventId);
                     return (
-                      <tr key={order.id} className={`${idx !== orders.length - 1 ? 'border-b-[4px] border-black' : ''} hover:bg-gray-50 transition-colors`}>
+                      <tr key={order.id} className={`${idx !== visibleOrders.length - 1 ? 'border-b-[4px] border-black' : ''} hover:bg-gray-50 transition-colors`}>
                         <td className="p-4 font-mono font-bold text-gray-600 border-r-[4px] border-black">{order.id}</td>
                         <td className="p-4 border-r-[4px] border-black">
                            <p className="font-black uppercase truncate max-w-[200px]">{event?.title}</p>
@@ -207,6 +250,95 @@ export function Dashboard() {
                   })
                 )}
               </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'analytics' && (
+        <div className="bg-white border-[4px] border-black shadow-[12px_12px_0px_#000] overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-brand-pink border-b-[4px] border-black">
+                  <th className="p-4 font-black uppercase tracking-widest border-r-[4px] border-black text-black">Asset Position</th>
+                  <th className="p-4 font-black uppercase tracking-widest border-r-[4px] border-black text-right text-black">Avg Buy Price</th>
+                  <th className="p-4 font-black uppercase tracking-widest border-r-[4px] border-black text-right text-black">Sell Price</th>
+                  <th className="p-4 font-black uppercase tracking-widest border-r-[4px] border-black text-right text-black">Realized PnL (Total)</th>
+                  <th className="p-4 font-black uppercase tracking-widest border-r-[4px] border-black text-center text-black">Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.filter(o => o.type === 'sell' && o.status === 'filled').length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-12 text-center font-bold text-gray-500 uppercase tracking-widest">
+                      No active trades found.
+                    </td>
+                  </tr>
+                ) : (
+                  orders.filter(o => o.type === 'sell' && o.status === 'filled').map((order, idx) => {
+                    const event = getEventForTicket(order.eventId);
+                    const avgEntryPrice = (order as any).avgBuyPrice || 0;
+                    const sellPrice = order.priceSui;
+                    
+                    const pnl = sellPrice - avgEntryPrice;
+                    const totalPnl = pnl * order.quantity;
+                    const isProfit = pnl > 0;
+                    const isNeutral = pnl === 0;
+
+                    return (
+                      <tr key={order.id} className={`${idx !== orders.length - 1 ? 'border-b-[4px] border-black' : ''} hover:bg-gray-50 transition-colors`}>
+                        <td className="p-4 border-r-[4px] border-black">
+                           <p className="font-black uppercase truncate max-w-[300px]">{event?.title}</p>
+                           <p className="font-bold text-xs text-gray-500 uppercase">{order.ticketClass} (x{order.quantity} SOLD)</p>
+                        </td>
+                        <td className="p-4 font-mono font-bold text-right border-r-[4px] border-black text-lg">{avgEntryPrice.toFixed(2)} SUI</td>
+                        <td className="p-4 font-mono font-bold text-right border-r-[4px] border-black text-lg">{sellPrice.toFixed(2)} SUI</td>
+                        <td className={`p-4 font-mono font-black text-right border-r-[4px] border-black text-xl ${isProfit ? 'text-green-600' : isNeutral ? 'text-gray-500' : 'text-red-500'}`}>
+                           {isProfit ? '+' : ''}{totalPnl.toFixed(2)} SUI
+                        </td>
+                        <td className="p-4 text-center font-black uppercase tracking-widest">
+                           {isProfit ? (
+                             <span className="bg-brand-green border-[3px] border-black px-4 py-2 shadow-[2px_2px_0px_#000] text-black tracking-widest">THẮNG</span>
+                           ) : isNeutral ? (
+                             <span className="bg-gray-200 border-[3px] border-black px-4 py-2 shadow-[2px_2px_0px_#000] text-gray-600">HÒA</span>
+                           ) : (
+                             <span className="bg-[#ff5f56] border-[3px] border-black px-4 py-2 shadow-[2px_2px_0px_#000] text-white tracking-widest">LỖ</span>
+                           )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+              {orders.filter(o => o.type === 'sell' && o.status === 'filled').length > 0 && (() => {
+                const soldOrders = orders.filter(o => o.type === 'sell' && o.status === 'filled');
+                const totalRealizedPnL = soldOrders.reduce((sum, order) => {
+                  const p = order.priceSui - ((order as any).avgBuyPrice || 0);
+                  return sum + (p * order.quantity);
+                }, 0);
+                const isTotalProfit = totalRealizedPnL >= 0;
+
+                return (
+                  <tfoot>
+                    <tr className="bg-brand-yellow border-t-[4px] border-black">
+                      <td colSpan={3} className="p-4 font-black uppercase tracking-widest border-r-[4px] border-black text-right text-xl">
+                        TOTAL REALIZED PnL:
+                      </td>
+                      <td className={`p-4 font-mono font-black text-right border-r-[4px] border-black text-2xl ${isTotalProfit ? 'text-green-700' : 'text-red-700'}`}>
+                        {isTotalProfit ? '+' : ''}{totalRealizedPnL.toFixed(2)} SUI
+                      </td>
+                      <td className="p-4 text-center font-black uppercase tracking-widest">
+                         {isTotalProfit ? (
+                           <span className="text-green-700 text-xl tracking-widest">WINNING 🚀</span>
+                         ) : (
+                           <span className="text-red-700 text-xl tracking-widest">DOWN 📉</span>
+                         )}
+                      </td>
+                    </tr>
+                  </tfoot>
+                );
+              })()}
             </table>
           </div>
         </div>

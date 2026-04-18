@@ -1,8 +1,9 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useAppStore } from '../store';
 import { X, Trash2, Ticket as TicketIcon } from 'lucide-react';
-import { MOCK_EVENTS } from '../mockData';
-import { useState } from 'react';
+import { fetchEvents } from '../api/mockApi';
+import type { Event } from '../types';
+import { useState, useEffect } from 'react';
 
 interface CartDrawerProps {
   onCheckout: () => void;
@@ -11,9 +12,14 @@ interface CartDrawerProps {
 export function CartDrawer({ onCheckout }: CartDrawerProps) {
   const { cart, isCartOpen, setCartOpen, removeFromCart, isWalletConnected } = useAppStore();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    fetchEvents().then(setEvents);
+  }, []);
 
   // Group cart items by event to show nice details
-  const getEventForTicket = (eventId: string) => MOCK_EVENTS.find(e => e.id === eventId);
+  const getEventForTicket = (eventId: string) => events.find(e => e.id === eventId);
   
   const totalPrice = cart.reduce((sum, t) => sum + t.priceSui, 0);
 

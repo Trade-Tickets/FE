@@ -11,8 +11,13 @@ export function LandingPage() {
       {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 bg-brand-bg/90 backdrop-blur-md border-b-[4px] border-black">
          <div className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto w-full">
-             <div className="bg-black px-4 py-2 rotate-[-2deg] border-[3px] border-black shadow-[4px_4px_0px_#fde047] hover:rotate-0 transition-transform cursor-pointer" onClick={() => window.scrollTo({top:0, behavior:'smooth'})}>
-                <span className="text-2xl font-black uppercase tracking-tighter mix-blend-difference text-white">FairTicket</span>
+             <div className="flex items-center gap-3 cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                <div className="w-12 h-12 border-[3px] border-black bg-white shadow-[4px_4px_0px_#fde047] rotate-[2deg] rounded-lg overflow-hidden flex items-center justify-center group-hover:rotate-0 transition-transform">
+                   <img src="/logo.jpg" alt="FairTicket Logo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                </div>
+                <div className="bg-black px-4 py-2 rotate-[-2deg] border-[3px] border-black shadow-[4px_4px_0px_#fde047] group-hover:rotate-0 transition-transform">
+                   <span className="text-2xl font-black uppercase tracking-tighter mix-blend-difference text-white">FairTicket</span>
+                </div>
              </div>
              
              <div className="hidden md:flex gap-8 font-black uppercase tracking-widest text-sm items-center">
@@ -271,8 +276,13 @@ export function LandingPage() {
       {/* Footer */}
       <footer className="bg-brand-bg py-16 px-6 relative">
          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
-            <div className="bg-black px-6 py-3 border-[4px] border-black shadow-[6px_6px_0px_#4ade80] -rotate-2 hover:rotate-0 transition-transform">
-                <span className="text-3xl font-black uppercase tracking-tight text-white mix-blend-difference">FairTicket</span>
+            <div className="flex items-center gap-4 cursor-pointer group" onClick={() => window.scrollTo({top:0, behavior:'smooth'})}>
+                <div className="w-14 h-14 border-[4px] border-black bg-white shadow-[6px_6px_0px_#4ade80] rotate-[3deg] rounded-lg overflow-hidden flex items-center justify-center group-hover:-rotate-3 transition-transform">
+                   <img src="/logo.jpg" alt="FairTicket Logo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                </div>
+                <div className="bg-black px-6 py-3 border-[4px] border-black shadow-[6px_6px_0px_#4ade80] -rotate-2 group-hover:rotate-0 transition-transform">
+                   <span className="text-3xl font-black uppercase tracking-tight text-white mix-blend-difference">FairTicket</span>
+                </div>
             </div>
             
             <div className="text-2xl font-bold uppercase tracking-widest text-center">

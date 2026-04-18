@@ -5,6 +5,8 @@ import { useState } from 'react';
 import type { Event } from '../types';
 import { useSuiClientQuery } from '@mysten/dapp-kit';
 import { useSuiTrade } from '../hooks/useSuiTrade';
+import { useTradeSimulator } from '../hooks/useTradeSimulator';
+import { recordTrade } from '../api/backendApi';
 
 // Sub-components
 import { PriceChart } from './trade/PriceChart';
@@ -35,7 +37,14 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
   const [selectedClass, setSelectedClass] = useState<string>(event.marketStats?.[0]?.ticketClass || 'VIP');
 
   const currentStat = event.marketStats?.find(s => s.ticketClass === selectedClass) || event.marketStats?.[0];
-  const isProfit = (currentStat?.change24h || 0) >= 0;
+
+  // ── Live market simulator (per-transaction tick data) ──────────────────────
+  const basePrice = currentStat?.floorPrice || 0.55;
+  const { candles, trades, currentPrice, change24h, volume24h } = useTradeSimulator(basePrice, true);
+
+  // isProfit tracks the LAST TRADE direction: buy (price up) = green, sell (price down) = red
+  const lastCandle = candles[candles.length - 1];
+  const isProfit = lastCandle?.isBullish ?? (change24h >= 0);
 
   const handleExecuteTrade = async (qty: number, price: number) => {
     if (!isWalletConnected || !walletAddress) return;
@@ -79,6 +88,11 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
     }
 
     // Update local portfolio state
+    const orderValue = price * qty;
+    const platformFee = orderValue * 0.001;
+    const sellTax = activeTab === 'sell' ? orderValue * 0.005 : 0;
+    const totalCost = activeTab === 'buy' ? orderValue + platformFee : orderValue - platformFee - sellTax;
+
     await placeOrder({
       eventId: event.id,
       ticketClass: selectedClass,
@@ -86,6 +100,21 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
       priceSui: price,
       quantity: qty,
     });
+
+    // Persist trade to BE (fire-and-forget, don't block UX)
+    recordTrade({
+      walletAddress,
+      eventId: event.id,
+      eventTitle: event.title,
+      ticketClass: selectedClass,
+      tradeType: activeTab,
+      priceSui: price,
+      quantity: qty,
+      totalCost,
+      platformFee,
+      sellTax,
+      status: 'filled',
+    }).catch(() => { /* BE offline — ignore silently */ });
 
     onPurchaseComplete();
   };
@@ -117,24 +146,27 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
               </div>
             </div>
 
-            {/* Stat Overview */}
+            {/* Stat Overview — now uses live currentPrice + change24h */}
             <div className="p-4 md:p-6 hidden md:flex gap-8 items-center">
               <div>
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Index Price</p>
-                <p className="text-3xl font-black font-mono">{currentStat?.floorPrice} SUI</p>
+                <p className="text-3xl font-black font-mono tabular-nums">
+                  {currentPrice.toFixed(4)}{' '}
+                  <span className="text-lg text-gray-500">SUI</span>
+                </p>
               </div>
               <div>
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">24H Change</p>
                 <div className="flex items-center gap-1 font-mono">
                   {isProfit ? <TrendingUp size={20} className="text-green-600" /> : <TrendingDown size={20} className="text-red-500" />}
                   <p className={`text-xl font-bold ${isProfit ? 'text-green-600' : 'text-red-500'}`}>
-                    {isProfit ? '+' : ''}{currentStat?.change24h}%
+                    {isProfit ? '+' : ''}{change24h}%
                   </p>
                 </div>
               </div>
               <div>
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">24H Vol</p>
-                <p className="text-xl font-bold font-mono">{currentStat?.volume24h}</p>
+                <p className="text-xl font-bold font-mono tabular-nums">{volume24h.toLocaleString()} SUI</p>
               </div>
             </div>
           </div>
@@ -165,13 +197,19 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
               ))}
             </div>
 
-            {/* Chart */}
-            <PriceChart eventTitle={event.title} selectedClass={selectedClass} currentStat={currentStat} isProfit={isProfit} />
+            {/* Candlestick Chart */}
+            <PriceChart
+              eventTitle={event.title}
+              selectedClass={selectedClass}
+              candles={candles}
+              currentPrice={currentPrice}
+              isProfit={isProfit}
+            />
 
             {/* OrderBook + Recent Trades */}
             <div className="flex-1 flex text-xs font-mono font-bold overflow-hidden">
               <OrderBook eventId={event.id} selectedClass={selectedClass} currentStat={currentStat} orders={orders} isProfit={isProfit} />
-              <RecentTrades currentStat={currentStat} />
+              <RecentTrades trades={trades} />
             </div>
           </div>
 
@@ -181,7 +219,7 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             onExecuteTrade={handleExecuteTrade}
-            defaultPrice={currentStat?.floorPrice || 50}
+            defaultPrice={currentPrice}
             suiBalance={suiBalance}
           />
         </div>

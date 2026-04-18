@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAppStore } from '../store';
 import type { Event } from '../types';
-import { fetchEvents } from '../api/mockApi';
+import { fetchEvents } from '../api/backendApi';
 import { QrCode, ArrowRightLeft, TrendingUp, TrendingDown, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 

@@ -1,11 +1,19 @@
-import type { MarketStat } from '../../types';
+import { useEffect, useRef } from 'react';
+import type { TradeTick } from '../../hooks/useTradeSimulator';
 
 interface RecentTradesProps {
-  currentStat: MarketStat | undefined;
+  trades: TradeTick[];
 }
 
-export function RecentTrades({ currentStat }: RecentTradesProps) {
-  const basePrice = currentStat?.floorPrice || 50;
+export function RecentTrades({ trades }: RecentTradesProps) {
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to top when new trades arrive (newest on top)
+  useEffect(() => {
+    if (listRef.current) {
+      listRef.current.scrollTop = 0;
+    }
+  }, [trades.length]);
 
   return (
     <div className="w-[45%] flex flex-col bg-white overflow-hidden">
@@ -18,23 +26,32 @@ export function RecentTrades({ currentStat }: RecentTradesProps) {
         <span className="w-[20%] text-right">Vol</span>
         <span className="w-[15%] text-right">M/B</span>
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col p-2 gap-[2px] bg-white">
-        {Array.from({ length: 25 }).map((_, i) => {
-          const isBuy = Math.random() > 0.5;
-          const price = (basePrice + (Math.random() * 2 - 1)).toFixed(2);
+      <div ref={listRef} className="flex-1 overflow-y-auto custom-scrollbar flex flex-col p-2 gap-[2px] bg-white">
+        {trades.map((trade, i) => {
+        // Vietnamese convention: M = Mua (Buy) = green, B = Bán (Sell) = red
+          const isMua = trade.side === 'M';
+          const isNew = i === 0;
           return (
-            <div key={i} className={`flex px-2 py-1.5 border-b-[1px] border-gray-100 hover:bg-gray-100 items-center ${isBuy ? 'bg-green-50/50' : 'bg-red-50/50'}`}>
-              <span className="w-[30%] text-left text-gray-500 font-medium tracking-tighter">
-                {new Date(Date.now() - Math.floor(Math.random() * i * 300000)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            <div
+              key={trade.id}
+              className={`flex px-2 py-1.5 border-b-[1px] border-gray-100 hover:bg-gray-100 items-center transition-colors duration-300 ${isMua ? 'bg-green-50/50' : 'bg-red-50/50'} ${isNew ? 'animate-pulse-once' : ''}`}
+            >
+              <span className="w-[30%] text-left text-gray-500 font-medium tracking-tighter text-[10px]">
+                {trade.time}
               </span>
-              <span className={`w-[35%] text-center font-black ${isBuy ? 'text-green-600' : 'text-red-500'}`}>
-                {price}
+              <span className={`w-[35%] text-center font-black text-[10px] ${isMua ? 'text-green-600' : 'text-red-500'}`}>
+                {trade.price.toFixed(4)}
+                {trade.priceChange !== 0 && (
+                  <span className={`ml-1 text-[8px] ${trade.priceChange > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {trade.priceChange > 0 ? '▲' : '▼'}
+                  </span>
+                )}
               </span>
-              <span className="w-[20%] text-right text-black font-bold">
-                {Math.floor(Math.random() * 10 + 1)}00
+              <span className="w-[20%] text-right text-black font-bold text-[10px]">
+                {trade.volume.toLocaleString()}
               </span>
-              <span className={`w-[15%] text-right font-black ${isBuy ? 'text-green-600' : 'text-red-500'}`}>
-                {isBuy ? 'M' : 'B'}
+              <span className={`w-[15%] text-right font-black text-[10px] ${isMua ? 'text-green-600' : 'text-red-500'}`}>
+                {trade.side}
               </span>
             </div>
           );

@@ -19,6 +19,10 @@ function WalletSync() {
       isWalletConnected: !!account,
       walletAddress: account ? account.address : null,
     });
+
+    if (account?.address) {
+      useAppStore.getState().syncWalletDataFromBE();
+    }
   }, [account]);
 
   return null;

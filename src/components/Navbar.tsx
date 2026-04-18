@@ -26,24 +26,35 @@ export function Navbar() {
   return (
     <nav className="flex items-center justify-between p-6 border-b-[4px] border-black bg-brand-bg sticky top-0 z-40">
       {/* Logo */}
-      <div className="flex items-center cursor-pointer ml-4" onClick={() => setActivePage('landing')}>
-        <div className="w-8 h-8 bg-brand-green border-[3px] border-black flex items-center justify-center text-black font-black text-xl neo-box rotate-[-6deg]">
-          F
-        </div>
-        <div className="w-8 h-8 bg-brand-yellow border-[3px] border-black flex items-center justify-center text-black font-black text-xl neo-box translate-y-2 z-10">
-          A
-        </div>
-        <div className="w-8 h-8 bg-brand-purple border-[3px] border-black flex items-center justify-center text-black font-black text-xl neo-box rotate-[6deg] -ml-1">
-          I
-        </div>
-        <div className="w-8 h-8 bg-brand-pink border-[3px] border-black flex items-center justify-center text-black font-black text-xl neo-box -ml-1">
-          R
+      <div className="flex items-center cursor-pointer ml-4 gap-3 group" onClick={() => setActivePage('landing')}>
+        <div className="w-14 h-14 border-[3px] border-black bg-white shadow-[4px_4px_0px_#000] rounded-lg flex items-center justify-center overflow-hidden transition-transform group-hover:-rotate-3">
+          <img
+            src="/logo.jpg"
+            alt="FairTicket Logo"
+            className="w-full h-full object-cover"
+            referrerPolicy="no-referrer"
+          />
         </div>
 
-        <div className="flex flex-col ml-3">
-          <span className="text-3xl font-black uppercase leading-none tracking-tighter">TICKET</span>
-          <div className="bg-black text-white text-[10px] font-bold px-2 py-0.5 transform -skew-x-[12deg] w-fit">
-            APP DEVELOPER
+        <div className="flex items-center">
+          <div className="w-8 h-8 bg-brand-green border-[3px] border-black flex items-center justify-center text-black font-black text-xl neo-box rotate-[-6deg]">
+            F
+          </div>
+          <div className="w-8 h-8 bg-brand-yellow border-[3px] border-black flex items-center justify-center text-black font-black text-xl neo-box translate-y-2 z-10">
+            A
+          </div>
+          <div className="w-8 h-8 bg-brand-purple border-[3px] border-black flex items-center justify-center text-black font-black text-xl neo-box rotate-[6deg] -ml-1">
+            I
+          </div>
+          <div className="w-8 h-8 bg-brand-pink border-[3px] border-black flex items-center justify-center text-black font-black text-xl neo-box -ml-1">
+            R
+          </div>
+
+          <div className="flex flex-col ml-3">
+            <span className="text-3xl font-black uppercase leading-none tracking-tighter">TICKET</span>
+            <div className="bg-black text-white text-[10px] font-bold px-2 py-0.5 transform -skew-x-[12deg] w-fit">
+              APP DEVELOPER
+            </div>
           </div>
         </div>
       </div>

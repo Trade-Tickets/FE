@@ -16,17 +16,9 @@ export function Marketplace() {
   const [purchasingEvent, setPurchasingEvent] = useState<Event | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { activePage } = useAppStore();
-
-  // Simulate initial load
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleTradeComplete = () => {
     setIsCheckingOut(true);

@@ -3,7 +3,7 @@ import { X, Calendar, MapPin, Users, Ticket as TicketIcon, Lock } from 'lucide-r
 import { useState, useEffect } from 'react';
 import type { Event, Comment } from '../types';
 import { useAppStore } from '../store';
-import { fetchComments } from '../api/mockApi';
+import { fetchComments, postComment } from '../api/backendApi';
 import { DiscussionSection } from './common/DiscussionSection';
 
 interface EventDetailModalProps {
@@ -18,14 +18,13 @@ export function EventDetailModal({ event, onClose, onBuyTickets }: EventDetailMo
   const [newCommentText, setNewCommentText] = useState("");
   const [isLoadingComments, setIsLoadingComments] = useState(false);
 
-  // Fetch comments from mock API
+  // Fetch comments from BE
   useEffect(() => {
     if (!event) return;
     setIsLoadingComments(true);
-    fetchComments(event.id).then(data => {
-      setComments(data);
-      setIsLoadingComments(false);
-    });
+    fetchComments(event.id)
+      .then(data => { setComments(data); setIsLoadingComments(false); })
+      .catch(() => { setComments([]); setIsLoadingComments(false); });
   }, [event?.id]);
 
   if (!event) return null;
@@ -71,7 +70,7 @@ export function EventDetailModal({ event, onClose, onBuyTickets }: EventDetailMo
     setComments(prev => replyRecursive(prev));
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (!newCommentText.trim()) return;
     const newC: Comment = {
       id: `c-${Date.now()}`,
@@ -81,7 +80,16 @@ export function EventDetailModal({ event, onClose, onBuyTickets }: EventDetailMo
       timestamp: "Just now",
       likes: 0
     };
-    setComments([newC, ...comments]);
+
+    if (event) {
+      try {
+        const saved = await postComment(event.id, newC);
+        setComments([saved, ...comments]);
+      } catch {
+        setComments([newC, ...comments]);
+      }
+    }
+
     setNewCommentText("");
   };
 

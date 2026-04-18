@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { Ticket, Order, OrderStatus, NotificationItem } from './types';
 import { PLATFORM_FEE_RATE, SELL_TAX_RATE } from './types';
-import { fetchFloorPrice } from './api/mockApi';
+import { fetchFloorPrice, fetchWalletTrades, recordTrade, type TradeRecord } from './api/backendApi';
 
 interface AppState {
   notifications: NotificationItem[];
@@ -33,6 +33,7 @@ interface AppState {
   orders: Order[];
   placeOrder: (order: Omit<Order, 'id' | 'status' | 'createdAt' | 'expiresAt'>) => Promise<void>;
   cancelOrder: (orderId: string) => void;
+  syncWalletDataFromBE: () => Promise<void>;
 
   purchaseTickets: () => Promise<boolean>;
 
@@ -90,10 +91,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   orders: [],
 
   placeOrder: async (newOrder) => {
-    const floorPrice = await fetchFloorPrice(newOrder.eventId, newOrder.ticketClass);
+    const floorPrice = await fetchFloorPrice(newOrder.eventId, newOrder.ticketClass).catch(() => 0.5);
 
     return new Promise((resolve) => {
-      setTimeout(() => {
+      setTimeout(async () => {
         const order: Order = {
           ...newOrder,
           id: `ORD-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
@@ -102,19 +103,19 @@ export const useAppStore = create<AppState>((set, get) => ({
           expiresAt: Date.now() + 65000,
         };
 
+        let filledOrder = false;
+
         set((state) => {
           let updatedOrders = [order, ...state.orders];
           let updatedTickets = [...state.userOwnedTickets];
 
           const lowestAsk = floorPrice + 0.1;
-          const highestBid = floorPrice - 0.2;
 
-          // MATCHING LOGIC
           if (order.type === 'buy') {
             if (order.priceSui >= lowestAsk) {
               order.status = 'filled';
+              filledOrder = true;
 
-              // Fee calculation: Platform fee 0.1%
               const orderValue = order.priceSui * order.quantity;
               const platformFee = orderValue * PLATFORM_FEE_RATE;
               const totalCost = orderValue + platformFee;
@@ -141,15 +142,14 @@ export const useAppStore = create<AppState>((set, get) => ({
               get().addNotification(`Buy Order Placed on Order Book`, 'info');
             }
           } else if (order.type === 'sell') {
-            // SELL always fills — any price is accepted
             order.status = 'filled';
+            filledOrder = true;
 
             const ticketsOfClass = updatedTickets.filter(t => t.eventId === order.eventId && t.ticketClass === order.ticketClass);
             const totalSpend = ticketsOfClass.reduce((sum, t) => sum + t.priceSui, 0);
             const avgBuyPrice = ticketsOfClass.length > 0 ? totalSpend / ticketsOfClass.length : order.priceSui;
             order.avgBuyPrice = avgBuyPrice;
 
-            // Fee calculation: Platform fee 0.1% + Sell tax 0.5%
             const orderValue = order.priceSui * order.quantity;
             const platformFee = orderValue * PLATFORM_FEE_RATE;
             const sellTax = orderValue * SELL_TAX_RATE;
@@ -178,6 +178,29 @@ export const useAppStore = create<AppState>((set, get) => ({
             userOwnedTickets: updatedTickets
           };
         });
+
+        if (filledOrder && get().walletAddress) {
+          const walletAddress = get().walletAddress!;
+          try {
+            await recordTrade({
+              id: order.id,
+              walletAddress,
+              eventId: order.eventId,
+              eventTitle: `Event ${order.eventId}`,
+              ticketClass: order.ticketClass,
+              tradeType: order.type,
+              priceSui: order.priceSui,
+              quantity: order.quantity,
+              totalCost: order.totalCost || 0,
+              platformFee: order.platformFee || 0,
+              sellTax: order.sellTax || 0,
+              status: order.status,
+            });
+          } catch {
+            get().addNotification('⚠️ Saved local, BE sync failed', 'error');
+          }
+        }
+
         resolve();
       }, 800);
     });
@@ -204,6 +227,43 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (!changed) return state;
       return { orders: updatedOrders };
     });
+  },
+
+  syncWalletDataFromBE: async () => {
+    const wallet = get().walletAddress;
+    if (!wallet) return;
+
+    try {
+      const trades: TradeRecord[] = await fetchWalletTrades(wallet);
+      const mappedOrders: Order[] = trades.map((t) => ({
+        id: t.id,
+        eventId: t.eventId,
+        ticketClass: t.ticketClass,
+        type: t.tradeType,
+        priceSui: t.priceSui,
+        quantity: t.quantity,
+        status: (t.status as OrderStatus) || 'filled',
+        createdAt: new Date(t.createdAt).getTime(),
+        expiresAt: new Date(t.createdAt).getTime() + 65000,
+        platformFee: t.platformFee,
+        sellTax: t.sellTax,
+        totalCost: t.totalCost,
+      }));
+
+      const mappedTickets: Ticket[] = trades
+        .filter((t) => t.tradeType === 'buy' && t.status === 'filled')
+        .flatMap((t) => Array.from({ length: t.quantity }).map((_, idx) => ({
+          id: `${t.id}-${idx}`,
+          eventId: t.eventId,
+          ticketClass: t.ticketClass,
+          priceSui: t.priceSui,
+          status: 'sold' as const,
+        })));
+
+      set({ orders: mappedOrders, userOwnedTickets: mappedTickets });
+    } catch {
+      // keep local state when BE unavailable
+    }
   },
 
   purchaseTickets: async () => {

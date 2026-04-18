@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useAppStore } from '../store';
 import { X, QrCode, ArrowRightLeft, TrendingUp, TrendingDown } from 'lucide-react';
-import { fetchEvents } from '../api/mockApi';
+import { fetchEvents } from '../api/backendApi';
 import type { Event } from '../types';
 import { useState, useEffect } from 'react';
 

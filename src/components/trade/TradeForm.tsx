@@ -75,9 +75,9 @@ export function TradeForm({ isWalletConnected, activeTab, setActiveTab, onExecut
           <div className="flex flex-col gap-2">
             <label className="font-bold text-sm uppercase tracking-widest text-gray-600">Limit Price (SUI)</label>
             <div className="flex bg-white border-[3px] border-black h-12 shadow-[4px_4px_0px_#000]">
-              <button onClick={() => setOrderPrice(Math.max(1, orderPrice - 1))} className="w-12 border-r-[3px] border-black font-black text-xl hover:bg-gray-200 active:bg-gray-300">-</button>
-              <input type="number" value={orderPrice} onChange={(e) => setOrderPrice(Math.max(0, parseFloat(e.target.value) || 0))} className="flex-1 text-center font-mono font-black text-xl outline-none min-w-0" />
-              <button onClick={() => setOrderPrice(orderPrice + 1)} className="w-12 border-l-[3px] border-black font-black text-xl hover:bg-gray-200 active:bg-gray-300">+</button>
+              <button onClick={() => setOrderPrice(Number(Math.max(0.01, orderPrice - 0.01).toFixed(4)))} className="w-12 border-r-[3px] border-black font-black text-xl hover:bg-gray-200 active:bg-gray-300">-</button>
+              <input type="number" step="0.01" value={orderPrice} onChange={(e) => setOrderPrice(Math.max(0, parseFloat(e.target.value) || 0))} className="flex-1 text-center font-mono font-black text-xl outline-none min-w-0" />
+              <button onClick={() => setOrderPrice(Number((orderPrice + 0.01).toFixed(4)))} className="w-12 border-l-[3px] border-black font-black text-xl hover:bg-gray-200 active:bg-gray-300">+</button>
             </div>
           </div>
         </div>

@@ -1,12 +1,8 @@
-// ========================================
-// useTradeSimulator - Per-transaction live market data
-// Generates candle (OHLC) data and recent trades tick-by-tick
-// ========================================
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 export interface CandleData {
-  time: string;      // HH:MM:SS
+  time: string;
   timestamp: number;
   open: number;
   high: number;
@@ -21,15 +17,15 @@ export interface TradeTick {
   time: string;
   price: number;
   volume: number;
-  side: 'B' | 'S'; // B = Buy, S = Sell
-  priceChange: number; // change from prev trade
+  side: 'B' | 'S';
+  priceChange: number;
 }
 
 interface SimulatorState {
   candles: CandleData[];
   trades: TradeTick[];
   currentPrice: number;
-  change24h: number; // percent change
+  change24h: number;
   volume24h: number;
 }
 
@@ -39,11 +35,11 @@ function formatTime(d: Date) {
 
 function generateInitialCandles(basePrice: number, count: number = 60): CandleData[] {
   const candles: CandleData[] = [];
-  let price = basePrice * (0.88 + Math.random() * 0.1); // start a bit lower
+  let price = basePrice * (0.88 + Math.random() * 0.1);
   const now = Date.now();
 
   for (let i = count; i >= 0; i--) {
-    const ts = now - i * 4000; // ~4s per candle
+    const ts = now - i * 4000;
     const volatility = basePrice * 0.015;
     const open = price;
     const move = (Math.random() - 0.48) * volatility;
@@ -79,7 +75,7 @@ function generateInitialTrades(basePrice: number, count: number = 30): TradeTick
     const volatility = basePrice * 0.012;
     const change = (Math.random() - 0.48) * volatility;
     price = Math.max(0.01, price + change);
-    const side: 'B' | 'S' = Math.random() > 0.45 ? 'B' : 'S'; // B = Buy, S = Sell
+    const side: 'B' | 'S' = Math.random() > 0.45 ? 'B' : 'S';
     trades.push({
       id: `t-${ts}`,
       time: formatTime(new Date(ts)),
@@ -108,7 +104,6 @@ export function useTradeSimulator(basePrice: number, active: boolean = true): Si
 
   const openOf24h = useRef(basePrice);
 
-  // Recalculate change when price changes
   const recalcChange = useCallback((newPrice: number) => {
     const pct = ((newPrice - openOf24h.current) / openOf24h.current) * 100;
     setChange24h(parseFloat(pct.toFixed(2)));
@@ -117,7 +112,6 @@ export function useTradeSimulator(basePrice: number, active: boolean = true): Si
   useEffect(() => {
     if (!active) return;
 
-    // Randomise interval between 1.5s–4s to feel natural
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const tick = () => {
@@ -125,17 +119,15 @@ export function useTradeSimulator(basePrice: number, active: boolean = true): Si
       const ts = now.getTime();
       const volatility = priceRef.current * 0.018;
 
-      // Bias slightly towards mean-reversion
       const drift = (basePrice - priceRef.current) * 0.03;
       const move = drift + (Math.random() - 0.50) * volatility;
       const newPrice = Math.max(0.01, parseFloat((priceRef.current + move).toFixed(4)));
 
       const isPriceUp = newPrice >= priceRef.current;
-      // B = Buy, S = Sell
+
       const side: 'B' | 'S' = isPriceUp ? 'B' : 'S';
       const volume = Math.floor(Math.random() * 18 + 1) * 100;
 
-      // New trade tick
       const trade: TradeTick = {
         id: `t-${ts}`,
         time: formatTime(now),
@@ -145,7 +137,6 @@ export function useTradeSimulator(basePrice: number, active: boolean = true): Si
         priceChange: parseFloat((newPrice - priceRef.current).toFixed(4)),
       };
 
-      // New candle (1 candle per trade — tick chart)
       const prevClose = priceRef.current;
       const high = Math.max(newPrice, prevClose) + Math.random() * volatility * 0.3;
       const low  = Math.min(newPrice, prevClose) - Math.random() * volatility * 0.3;
@@ -170,12 +161,10 @@ export function useTradeSimulator(basePrice: number, active: boolean = true): Si
       setVolume24h(prev => prev + volume);
       recalcChange(newPrice);
 
-      // Schedule next tick with random interval
       const nextInterval = 1500 + Math.random() * 2500;
       timeoutId = setTimeout(tick, nextInterval);
     };
 
-    // Start after a short delay
     timeoutId = setTimeout(tick, 800 + Math.random() * 1200);
 
     return () => clearTimeout(timeoutId);

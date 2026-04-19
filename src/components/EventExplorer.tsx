@@ -53,8 +53,7 @@ export function EventExplorer({ onEventClick }: EventExplorerProps) {
           <div className="w-6 h-6 bg-brand-green rounded-full border-[3px] border-black animate-pulse shadow-[2px_2px_0px_#000]"></div>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative w-full md:w-[350px]">
+                <div className="relative w-full md:w-[350px]">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <Search size={24} strokeWidth={3} className="text-black" />
           </div>
@@ -68,8 +67,7 @@ export function EventExplorer({ onEventClick }: EventExplorerProps) {
         </div>
       </div>
 
-      {/* Category Filter */}
-      <div className="flex gap-4 mb-10 flex-wrap">
+            <div className="flex gap-4 mb-10 flex-wrap">
         {CATEGORIES.map((category) => (
           <button
             key={category}
@@ -135,7 +133,7 @@ function EventCard({
   onClick: () => void;
   key?: string | number;
 }) {
-  const topStat = event.marketStats?.[0]; // Show the primary market stat
+  const topStat = event.marketStats?.[0];
   const statusColor =
     event.tradingStatus === "Live" ? "bg-brand-green" : "bg-gray-400";
 
@@ -146,8 +144,7 @@ function EventCard({
       onClick={onClick}
       className="bg-white border-[4px] border-black rounded-[16px] overflow-hidden cursor-pointer relative group transition-all duration-100 flex flex-col shadow-[8px_8px_0px_#000] h-full"
     >
-      {/* Cover Image & Tags */}
-      <div className="h-[180px] relative overflow-hidden bg-gray-200 border-b-[4px] border-black shrink-0">
+            <div className="h-[180px] relative overflow-hidden bg-gray-200 border-b-[4px] border-black shrink-0">
         <div className="absolute top-3 left-3 flex gap-2 z-10 flex-wrap">
           <span
             className={`px-3 py-1 ${statusColor} border-[3px] border-black text-black rounded text-xs font-black uppercase shadow-[2px_2px_0px_#000]`}
@@ -163,8 +160,7 @@ function EventCard({
         />
       </div>
 
-      {/* Content */}
-      <div className="p-6 flex flex-col flex-grow">
+            <div className="p-6 flex flex-col flex-grow">
         <h3 className="text-2xl font-black mb-2 line-clamp-2 leading-tight uppercase">
           {event.title}
         </h3>
@@ -188,8 +184,7 @@ function EventCard({
         </div>
       </div>
 
-      {/* Market Stats Bar */}
-      <div className="flex border-t-[4px] border-black bg-brand-bg relative z-10 shrink-0">
+            <div className="flex border-t-[4px] border-black bg-brand-bg relative z-10 shrink-0">
         <div className="w-1/2 p-4 border-r-[4px] border-black flex flex-col justify-center">
           <p className="font-extrabold text-[10px] text-gray-500 tracking-widest uppercase mb-1">
             {topStat ? `Floor (${topStat.ticketClass})` : "Floor"}

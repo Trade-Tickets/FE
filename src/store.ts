@@ -8,31 +8,25 @@ interface AppState {
   addNotification: (message: string, type?: 'success' | 'error' | 'info') => void;
   removeNotification: (id: string) => void;
 
-  // Navigation
   activePage: 'landing' | 'markets' | 'dashboard' | 'profile';
   setActivePage: (page: 'landing' | 'markets' | 'dashboard' | 'profile') => void;
 
-  // View States
   viewingEvent: Event | null;
   setViewingEvent: (event: Event | null) => void;
 
-  // Wallet State
   isWalletConnected: boolean;
   walletAddress: string | null;
 
-  // Cart State (legacy/quick-buy)
   cart: Ticket[];
   addToCart: (ticket: Ticket) => void;
   removeFromCart: (ticketId: string) => void;
   clearCart: () => void;
 
-  // UI States
   isCartOpen: boolean;
   setCartOpen: (open: boolean) => void;
   isMyTicketsOpen: boolean;
   setMyTicketsOpen: (open: boolean) => void;
 
-  // Owned Tickets & Orders
   userOwnedTickets: Ticket[];
   orders: Order[];
   placeOrder: (order: Omit<Order, 'id' | 'status' | 'createdAt' | 'expiresAt'>) => Promise<void>;
@@ -69,7 +63,6 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   isWalletConnected: false,
   walletAddress: null,
-
 
   cart: [],
 
@@ -269,7 +262,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
       set({ orders: mappedOrders, userOwnedTickets: mappedTickets });
     } catch {
-      // keep local state when BE unavailable
+
     }
   },
 

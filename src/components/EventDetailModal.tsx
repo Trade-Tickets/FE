@@ -18,7 +18,6 @@ export function EventDetailModal({ event, onClose, onBuyTickets }: EventDetailMo
   const [newCommentText, setNewCommentText] = useState("");
   const [isLoadingComments, setIsLoadingComments] = useState(false);
 
-  // Fetch comments from BE
   useEffect(() => {
     if (!event) return;
     setIsLoadingComments(true);
@@ -106,16 +105,14 @@ export function EventDetailModal({ event, onClose, onBuyTickets }: EventDetailMo
         exit={{ scale: 0.95, y: 20 }}
         className="w-full max-w-5xl h-[85vh] bg-white border-[4px] border-black flex flex-col md:flex-row shadow-[16px_16px_0px_#000] relative overflow-hidden"
       >
-        {/* Mobile Close Button */}
-        <button
+                <button
           onClick={onClose}
           className="md:hidden absolute top-4 right-4 z-50 w-10 h-10 bg-white border-[4px] border-black rounded-full flex items-center justify-center shadow-[4px_4px_0px_#000] active:translate-x-1 active:translate-y-1 active:shadow-none"
         >
           <X strokeWidth={3} />
         </button>
 
-        {/* Left Side: Artwork & Quick Info */}
-        <div className="w-full md:w-5/12 border-b-[4px] md:border-b-0 md:border-r-[4px] border-black flex flex-col bg-brand-bg relative h-[40vh] md:h-full shrink-0">
+                <div className="w-full md:w-5/12 border-b-[4px] md:border-b-0 md:border-r-[4px] border-black flex flex-col bg-brand-bg relative h-[40vh] md:h-full shrink-0">
           <img
             src={event.coverImage}
             alt={event.title}
@@ -163,10 +160,8 @@ export function EventDetailModal({ event, onClose, onBuyTickets }: EventDetailMo
           </div>
         </div>
 
-        {/* Right Side: Scrollable Details & Action */}
-        <div className="w-full md:w-7/12 flex flex-col bg-white overflow-hidden h-[45vh] md:h-full">
-          {/* Header Actions */}
-          <div className="hidden md:flex justify-end p-6 pb-0">
+                <div className="w-full md:w-7/12 flex flex-col bg-white overflow-hidden h-[45vh] md:h-full">
+                    <div className="hidden md:flex justify-end p-6 pb-0">
             <button
               onClick={onClose}
               className="w-12 h-12 bg-white border-[4px] border-black flex items-center justify-center hover:bg-black hover:text-white transition-all text-black hover:-translate-y-1 hover:shadow-[4px_4px_0px_#000]"
@@ -177,8 +172,7 @@ export function EventDetailModal({ event, onClose, onBuyTickets }: EventDetailMo
 
           <div className="p-6 md:p-8 md:pt-4 overflow-y-auto flex-grow flex flex-col gap-8 custom-scrollbar">
 
-            {/* Settlement Notice */}
-            <div className="bg-brand-blue/10 border-[3px] border-black p-4 shadow-[4px_4px_0px_#000]">
+                        <div className="bg-brand-blue/10 border-[3px] border-black p-4 shadow-[4px_4px_0px_#000]">
               <h4 className="font-black uppercase tracking-widest text-brand-purple flex items-center gap-2 mb-1">
                 <Lock size={16} /> Settlement Notice
               </h4>
@@ -187,16 +181,14 @@ export function EventDetailModal({ event, onClose, onBuyTickets }: EventDetailMo
               </p>
             </div>
 
-            {/* About */}
-            <section>
+                        <section>
               <h3 className="text-2xl font-black uppercase mb-4 inline-block border-b-[4px] border-brand-green pb-1 tracking-wides">About</h3>
               <p className="text-lg font-bold text-gray-700 leading-relaxed bg-brand-bg p-6 border-[3px] border-black shadow-[6px_6px_0px_#000]">
                 {event.about}
               </p>
             </section>
 
-            {/* Lineup */}
-            <section>
+                        <section>
               <h3 className="text-2xl font-black uppercase mb-4 inline-block border-b-[4px] border-brand-purple pb-1 tracking-wides flex items-center gap-2">
                 <Users strokeWidth={3} /> Lineup
               </h3>
@@ -209,8 +201,7 @@ export function EventDetailModal({ event, onClose, onBuyTickets }: EventDetailMo
               </div>
             </section>
 
-            {/* Discussion Section (fetched from API) */}
-            {isLoadingComments ? (
+                        {isLoadingComments ? (
               <div className="text-center py-8">
                 <p className="font-bold text-gray-400 uppercase animate-pulse">Loading discussion...</p>
               </div>
@@ -226,8 +217,7 @@ export function EventDetailModal({ event, onClose, onBuyTickets }: EventDetailMo
               />
             )}
 
-            {/* Mobile Organizer */}
-            <div className="md:hidden pt-4">
+                        <div className="md:hidden pt-4">
               <p className="text-sm uppercase font-extrabold text-gray-500 mb-2">Organized by</p>
               <div className="inline-block bg-white border-[3px] border-black px-4 py-2 font-black text-lg shadow-[4px_4px_0px_#000]">
                 {event.organizer}
@@ -237,8 +227,7 @@ export function EventDetailModal({ event, onClose, onBuyTickets }: EventDetailMo
             <div className="h-4"></div>
           </div>
 
-          {/* Sticky Trade Button */}
-          <div className="border-t-[4px] border-black p-6 bg-brand-yellow shrink-0 z-10 w-full relative">
+                    <div className="border-t-[4px] border-black p-6 bg-brand-yellow shrink-0 z-10 w-full relative">
             <div className="absolute top-0 left-0 w-full h-[4px] bg-black"></div>
             <button
               disabled={event.tradingStatus !== 'Live'}

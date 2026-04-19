@@ -1,13 +1,6 @@
-// ========================================
-// Mock API Service
-// Simulates REST API calls with fetch-like async pattern.
-// When the real BE is ready, replace the body of each function
-// with actual fetch() calls — the signatures stay the same.
-// ========================================
 
 import type { Event, Ticket, Comment } from '../types';
 
-// --- Helper: generate fake price history ---
 const generateHistory = (basePrice: number, volatility: number, trend: 'up' | 'down' | 'flat', dataPoints = 24) => {
   let currentPrice = basePrice;
   const history = [];
@@ -31,7 +24,6 @@ const generateHistory = (basePrice: number, volatility: number, trend: 'up' | 'd
   return history;
 };
 
-// --- Raw mock data (private to this module) ---
 const EVENTS_DATA: Event[] = [
   {
     id: "evt_1",
@@ -181,39 +173,29 @@ const COMMENTS_DATA: Record<string, Comment[]> = {
   ]
 };
 
-// ========================================
-// Public API Functions
-// ========================================
-
-/** Simulated network delay */
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-/** GET /api/events */
 export async function fetchEvents(): Promise<Event[]> {
   await delay(300);
   return structuredClone(EVENTS_DATA);
 }
 
-/** GET /api/events/:id */
 export async function fetchEventById(eventId: string): Promise<Event | null> {
   await delay(150);
   const event = EVENTS_DATA.find(e => e.id === eventId);
   return event ? structuredClone(event) : null;
 }
 
-/** GET /api/tickets?eventId=xxx */
 export async function fetchTicketsByEvent(eventId: string): Promise<Ticket[]> {
   await delay(200);
   return structuredClone(TICKETS_DATA.filter(t => t.eventId === eventId));
 }
 
-/** GET /api/events/:id/comments */
 export async function fetchComments(eventId: string): Promise<Comment[]> {
   await delay(250);
   return structuredClone(COMMENTS_DATA[eventId] || []);
 }
 
-/** POST /api/events/:id/comments */
 export async function postComment(eventId: string, comment: Comment): Promise<Comment> {
   await delay(200);
   if (!COMMENTS_DATA[eventId]) COMMENTS_DATA[eventId] = [];
@@ -221,7 +203,6 @@ export async function postComment(eventId: string, comment: Comment): Promise<Co
   return structuredClone(comment);
 }
 
-/** GET /api/market/floor-price  – used by matching engine */
 export async function fetchFloorPrice(eventId: string, ticketClass: string): Promise<number> {
   await delay(50);
   const event = EVENTS_DATA.find(e => e.id === eventId);

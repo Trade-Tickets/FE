@@ -24,24 +24,20 @@ export function CheckoutOverlay({ isOpen, isSuccess, onClose, onNavigateVault }:
             exit={{ scale: 0.9, y: 20 }}
             className="w-full max-w-lg relative pointer-events-auto"
           >
-            {/* Green shadow offset block */}
-            <div className="absolute inset-0 bg-[#00ff88] translate-x-4 translate-y-4 border-[4px] border-black"></div>
-            
-            {/* White Main Dialog Box */}
-            <div className="bg-[#edf6f0] border-[4px] border-black p-10 flex flex-col items-center relative z-10 text-center shadow-none">
+                        <div className="absolute inset-0 bg-[#00ff88] translate-x-4 translate-y-4 border-[4px] border-black"></div>
+
+                        <div className="bg-[#edf6f0] border-[4px] border-black p-10 flex flex-col items-center relative z-10 text-center shadow-none">
               {!isSuccess ? (
                  <>
-                   {/* Spinning Loading Icon */}
-                   <div className="w-24 h-24 rounded-full border-[6px] border-black flex items-center justify-center mb-6 relative bg-white">
+                                      <div className="w-24 h-24 rounded-full border-[6px] border-black flex items-center justify-center mb-6 relative bg-white">
                       <div className="absolute inset-0 rounded-full border-[6px] border-[#00ff88] border-b-transparent border-l-brand-yellow animate-spin"></div>
                       <Zap size={40} className="text-black" strokeWidth={3} fill="currentColor" />
                    </div>
-                   
+
                    <h2 className="text-4xl font-black uppercase mb-4 text-black tracking-tight">Signing Transaction</h2>
                    <p className="text-gray-600 text-lg font-bold mb-8">Broadcasting to the SUI network...</p>
-                   
-                   {/* Steps simulation list */}
-                   <div className="flex flex-col items-start gap-3 w-full max-w-xs mx-auto text-left font-bold text-gray-500">
+
+                                      <div className="flex flex-col items-start gap-3 w-full max-w-xs mx-auto text-left font-bold text-gray-500">
                      <div className="flex items-center gap-3"><div className="w-3 h-3 bg-[#00ff88] rounded-full border-2 border-black animate-pulse"></div> Verifying ownership</div>
                      <div className="flex items-center gap-3"><div className="w-3 h-3 bg-[#00ff88] rounded-full border-2 border-black animate-pulse"></div> Minting ticket NFT</div>
                      <div className="flex items-center gap-3"><div className="w-3 h-3 bg-[#00ff88] rounded-full border-2 border-black animate-pulse"></div> Writing to blockchain</div>
@@ -57,12 +53,11 @@ export function CheckoutOverlay({ isOpen, isSuccess, onClose, onNavigateVault }:
                    >
                      <CheckCircle2 size={48} strokeWidth={4} />
                    </motion.div>
-                   
+
                    <h2 className="text-4xl font-black uppercase mb-4 text-black tracking-tighter">Transaction Confirmed!</h2>
                    <p className="text-gray-600 text-lg font-bold mb-8 max-w-sm">Your order has been recorded securely on the SUI blockchain.</p>
-                   
-                   {/* Ticket Digest Receipt */}
-                   <div className="w-full bg-white border-[4px] border-black p-4 text-left mb-8 flex justify-between shadow-[6px_6px_0px_#000]">
+
+                                      <div className="w-full bg-white border-[4px] border-black p-4 text-left mb-8 flex justify-between shadow-[6px_6px_0px_#000]">
                       <div>
                         <p className="font-black text-xl uppercase">SUI Network Sign</p>
                         <p className="text-gray-500 font-bold text-sm">Valid Trade Digest</p>

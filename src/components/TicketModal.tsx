@@ -8,7 +8,6 @@ import { useSuiTrade } from '../hooks/useSuiTrade';
 import { useTradeSimulator } from '../hooks/useTradeSimulator';
 import { recordTrade } from '../api/backendApi';
 
-// Sub-components
 import { PriceChart } from './trade/PriceChart';
 import { OrderBook } from './trade/OrderBook';
 import { RecentTrades } from './trade/RecentTrades';
@@ -38,11 +37,9 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
 
   const currentStat = event.marketStats?.find(s => s.ticketClass === selectedClass) || event.marketStats?.[0];
 
-  // ── Live market simulator (per-transaction tick data) ──────────────────────
   const basePrice = currentStat?.floorPrice || 0.55;
   const { candles, trades, currentPrice, change24h, volume24h } = useTradeSimulator(basePrice, true);
 
-  // isProfit tracks the LAST TRADE direction: buy (price up) = green, sell (price down) = red
   const lastCandle = candles[candles.length - 1];
   const isProfit = lastCandle?.isBullish ?? (change24h >= 0);
 
@@ -52,8 +49,6 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
     const floorPrice = currentStat?.floorPrice || price;
     const lowestAsk = floorPrice + 0.1;
 
-    // BUY: fills only if price >= lowestAsk
-    // SELL: ALWAYS fills at any price
     const willFill = activeTab === 'sell' ? true : price >= lowestAsk;
 
     if (willFill) {
@@ -62,14 +57,14 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
 
         let txResult;
         if (activeTab === 'buy') {
-          // Buy: send full cost (orderValue + 0.1% fee) on-chain
+
           txResult = await executeBuyOnChain(walletAddress, price, qty);
           addNotification(
             `✅ Buy TX: ${txResult.txDigest.slice(0, 10)}... | -${txResult.netAmount.toFixed(4)} SUI`,
             'success'
           );
         } else {
-          // Sell: send fees+tax on-chain (platform deducts, net proceeds returned later)
+
           txResult = await executeSellOnChain(walletAddress, price, qty);
           addNotification(
             `✅ Sell TX: ${txResult.txDigest.slice(0, 10)}... | Fee+Tax: -${txResult.amountSpent.toFixed(4)} SUI`,
@@ -80,14 +75,13 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
         const errMsg = err instanceof Error ? err.message : String(err);
         if (errMsg.toLowerCase().includes('rejected') || errMsg.toLowerCase().includes('cancel') || errMsg.toLowerCase().includes('denied')) {
           addNotification('❌ Transaction rejected by user', 'error');
-          return; // Stop completely if user rejected
+          return;
         }
-        // Network / gas error — warn but continue so local state still updates
+
         addNotification(`⚠️ On-chain TX error (${errMsg.slice(0, 50)})`, 'error');
       }
     }
 
-    // Update local portfolio state
     const orderValue = price * qty;
     const platformFee = orderValue * 0.001;
     const sellTax = activeTab === 'sell' ? orderValue * 0.005 : 0;
@@ -101,7 +95,6 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
       quantity: qty,
     });
 
-    // Persist trade to BE (fire-and-forget, don't block UX)
     recordTrade({
       walletAddress,
       eventId: event.id,
@@ -114,7 +107,7 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
       platformFee,
       sellTax,
       status: 'filled',
-    }).catch(() => { /* BE offline — ignore silently */ });
+    }).catch(() => {  });
 
     onPurchaseComplete();
   };
@@ -132,8 +125,7 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
         exit={{ scale: 0.95, y: 20 }}
         className="w-full max-w-7xl bg-brand-bg border-[4px] border-black shadow-[16px_16px_0px_#000] overflow-hidden flex flex-col h-[90vh] relative"
       >
-        {/* Header */}
-        <div className="bg-brand-yellow flex flex-col md:flex-row justify-between items-start md:items-center relative z-20 shrink-0 border-b-[4px] border-black">
+                <div className="bg-brand-yellow flex flex-col md:flex-row justify-between items-start md:items-center relative z-20 shrink-0 border-b-[4px] border-black">
           <div className="flex w-full md:w-auto h-full">
             <div className="p-4 md:p-6 border-r-[4px] border-black flex flex-col justify-center bg-white w-full md:w-auto">
               <h2 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-3">
@@ -146,8 +138,7 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
               </div>
             </div>
 
-            {/* Stat Overview — now uses live currentPrice + change24h */}
-            <div className="p-4 md:p-6 hidden md:flex gap-8 items-center">
+                        <div className="p-4 md:p-6 hidden md:flex gap-8 items-center">
               <div>
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Index Price</p>
                 <p className="text-3xl font-black font-mono tabular-nums">
@@ -179,13 +170,10 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
           </button>
         </div>
 
-        {/* Trading Area */}
-        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-white">
+                <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-white">
 
-          {/* Left Column: Chart + OrderBook + Trades */}
-          <div className="w-full lg:w-2/3 flex flex-col border-b-[4px] lg:border-b-0 lg:border-r-[4px] border-black shrink-0 relative overflow-hidden bg-brand-bg">
-            {/* Asset Selectors */}
-            <div className="flex border-b-[4px] border-black bg-white overflow-x-auto custom-scrollbar">
+                    <div className="w-full lg:w-2/3 flex flex-col border-b-[4px] lg:border-b-0 lg:border-r-[4px] border-black shrink-0 relative overflow-hidden bg-brand-bg">
+                        <div className="flex border-b-[4px] border-black bg-white overflow-x-auto custom-scrollbar">
               {event.marketStats?.map(stat => (
                 <button
                   key={stat.ticketClass}
@@ -197,8 +185,7 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
               ))}
             </div>
 
-            {/* Candlestick Chart */}
-            <PriceChart
+                        <PriceChart
               eventTitle={event.title}
               selectedClass={selectedClass}
               candles={candles}
@@ -206,15 +193,13 @@ export function TicketModal({ event, onClose, onPurchaseComplete }: TicketModalP
               isProfit={isProfit}
             />
 
-            {/* OrderBook + Recent Trades */}
-            <div className="flex-1 flex text-xs font-mono font-bold overflow-hidden">
+                        <div className="flex-1 flex text-xs font-mono font-bold overflow-hidden">
               <OrderBook eventId={event.id} selectedClass={selectedClass} currentStat={currentStat} orders={orders} isProfit={isProfit} />
               <RecentTrades trades={trades} />
             </div>
           </div>
 
-          {/* Right Column: Trade Form */}
-          <TradeForm
+                    <TradeForm
             isWalletConnected={isWalletConnected}
             activeTab={activeTab}
             setActiveTab={setActiveTab}

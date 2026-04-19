@@ -5,7 +5,7 @@ export interface Ticket {
   id: string;
   eventId: string;
   ticketClass: TicketClass;
-  priceSui: number; // Purchase price
+  priceSui: number;
   status: TicketStatus;
 }
 
@@ -13,7 +13,7 @@ export interface MarketStat {
   ticketClass: TicketClass;
   originalPrice: number;
   floorPrice: number;
-  change24h: number; // percentage, positive or negative
+  change24h: number;
   volume24h: string;
   priceHistory: { time: string; price: number }[];
 }
@@ -35,25 +35,23 @@ export interface Event {
   marketStats: MarketStat[];
 }
 
-// Helper to generate fake price history
 const generateHistory = (basePrice: number, volatility: number, trend: 'up' | 'down' | 'flat', dataPoints = 24) => {
   let currentPrice = basePrice;
   const history = [];
   const now = new Date();
-  
+
   for (let i = dataPoints; i >= 0; i--) {
-      // Add random walk
+
       const randomShift = (Math.random() - 0.5) * volatility;
-      
-      // Add trend
+
       let trendShift = 0;
       if (trend === 'up') trendShift = volatility * 0.2;
       if (trend === 'down') trendShift = -volatility * 0.2;
 
       currentPrice += randomShift + trendShift;
-      if (currentPrice < 1) currentPrice = 1; // Prevent negative SUI
+      if (currentPrice < 1) currentPrice = 1;
 
-      const timePoint = new Date(now.getTime() - (i * 60 * 60 * 1000)); // Hourly data
+      const timePoint = new Date(now.getTime() - (i * 60 * 60 * 1000));
       history.push({
           time: timePoint.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           price: Number(currentPrice.toFixed(2))
@@ -76,7 +74,7 @@ export const MOCK_EVENTS: Event[] = [
     organizer: "Mysten Labs",
     tags: ["CRYPTO", "HOUSE"],
     tradingStatus: "Live",
-    settlementDate: "2026-10-13", // Trading halts 2 days before
+    settlementDate: "2026-10-13",
     marketStats: [
       { ticketClass: "Early Bird", originalPrice: 15, floorPrice: 45, change24h: 12.5, volume24h: "1.2K SUI", priceHistory: generateHistory(35, 5, 'up') },
       { ticketClass: "Regular", originalPrice: 25, floorPrice: 30, change24h: -5.2, volume24h: "800 SUI", priceHistory: generateHistory(32, 2, 'down') },
@@ -122,7 +120,7 @@ export const MOCK_EVENTS: Event[] = [
     ]
   },
   {
-    // Keeping other events simple
+
     id: "evt_4",
     title: "Devcon 8 - Global Hacker Space",
     coverImage: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2070&auto=format&fit=crop",
@@ -179,26 +177,21 @@ export const MOCK_EVENTS: Event[] = [
 ];
 
 export const MOCK_TICKETS: Ticket[] = [
-  // Tickets for Event 1 (Trading at Floor)
+
   { id: "t_101", eventId: "evt_1", ticketClass: "Early Bird", priceSui: 45, status: "available" },
   { id: "t_102", eventId: "evt_1", ticketClass: "Regular", priceSui: 30, status: "available" },
   { id: "t_103", eventId: "evt_1", ticketClass: "VIP", priceSui: 250, status: "available" },
   { id: "t_104", eventId: "evt_1", ticketClass: "VIP", priceSui: 255, status: "listing" },
-  
-  // Tickets for Event 2
+
   { id: "t_201", eventId: "evt_2", ticketClass: "Regular", priceSui: 55, status: "available" },
   { id: "t_202", eventId: "evt_2", ticketClass: "VIP", priceSui: 140, status: "available" },
 
-  // Tickets for Event 3
   { id: "t_301", eventId: "evt_3", ticketClass: "Online Standard", priceSui: 8, status: "available" },
   { id: "t_302", eventId: "evt_3", ticketClass: "In-Person Pass", priceSui: 110, status: "available" },
 
-  // Tickets for Event 4
   { id: "t_401", eventId: "evt_4", ticketClass: "Hacker Pass", priceSui: 120, status: "available" },
-  
-  // Tickets for Event 5
+
   { id: "t_501", eventId: "evt_5", ticketClass: "Gallery Entry", priceSui: 20, status: "sold" },
-  
-  // Tickets for Event 6
+
   { id: "t_601", eventId: "evt_6", ticketClass: "Investor Pass", priceSui: 450, status: "available" }
 ];

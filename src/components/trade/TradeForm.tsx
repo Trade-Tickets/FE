@@ -7,7 +7,7 @@ interface TradeFormProps {
   setActiveTab: (tab: 'buy' | 'sell') => void;
   onExecuteTrade: (qty: number, price: number) => Promise<void>;
   defaultPrice: number;
-  suiBalance?: string; // real SUI balance from wallet
+  suiBalance?: string;
 }
 
 export function TradeForm({ isWalletConnected, activeTab, setActiveTab, onExecuteTrade, defaultPrice, suiBalance }: TradeFormProps) {
@@ -19,11 +19,11 @@ export function TradeForm({ isWalletConnected, activeTab, setActiveTab, onExecut
   const platformFee = orderValue * PLATFORM_FEE_RATE;
   const sellTax = activeTab === 'sell' ? orderValue * SELL_TAX_RATE : 0;
   const totalCost = activeTab === 'buy' 
-    ? orderValue + platformFee               // buyer pays more
-    : orderValue - platformFee - sellTax;     // seller receives less
+    ? orderValue + platformFee
+    : orderValue - platformFee - sellTax;
 
   const balanceNum = parseFloat(suiBalance || '0');
-  // Only block buy if insufficient. Sell always fills regardless of balance.
+
   const insufficientFunds = activeTab === 'buy' && totalCost > balanceNum && balanceNum > 0;
 
   const handleSubmit = async () => {
@@ -35,8 +35,7 @@ export function TradeForm({ isWalletConnected, activeTab, setActiveTab, onExecut
 
   return (
     <div className="w-full lg:w-1/3 flex flex-col bg-white overflow-hidden relative">
-      {/* Tabs */}
-      <div className="flex border-b-[4px] border-black shrink-0 relative z-10">
+            <div className="flex border-b-[4px] border-black shrink-0 relative z-10">
         <button
           onClick={() => setActiveTab('buy')}
           className={`flex-1 py-4 font-black uppercase text-xl transition-colors border-r-[4px] border-black ${activeTab === 'buy' ? 'bg-brand-green text-black' : 'bg-white text-gray-400 hover:bg-gray-100'}`}
@@ -51,8 +50,7 @@ export function TradeForm({ isWalletConnected, activeTab, setActiveTab, onExecut
         </button>
       </div>
 
-      {/* Order Form */}
-      <div className="flex-1 overflow-y-auto p-6 bg-brand-bg relative custom-scrollbar flex flex-col gap-6">
+            <div className="flex-1 overflow-y-auto p-6 bg-brand-bg relative custom-scrollbar flex flex-col gap-6">
         <div className="flex justify-between items-center bg-white border-[3px] border-black p-3 shadow-[4px_4px_0px_#000]">
           <span className="font-bold text-gray-500 uppercase text-xs tracking-widest">Available Balance</span>
           <span className={`font-mono font-black ${insufficientFunds ? 'text-red-500' : ''}`}>
@@ -61,8 +59,7 @@ export function TradeForm({ isWalletConnected, activeTab, setActiveTab, onExecut
         </div>
 
         <div className="flex flex-col gap-4">
-          {/* Quantity */}
-          <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2">
             <label className="font-bold text-sm uppercase tracking-widest text-gray-600">Quantity (Tickets)</label>
             <div className="flex bg-white border-[3px] border-black h-12 shadow-[4px_4px_0px_#000]">
               <button onClick={() => setOrderQty(Math.max(1, orderQty - 1))} className="w-12 border-r-[3px] border-black font-black text-xl hover:bg-gray-200 active:bg-gray-300">-</button>
@@ -71,8 +68,7 @@ export function TradeForm({ isWalletConnected, activeTab, setActiveTab, onExecut
             </div>
           </div>
 
-          {/* Price */}
-          <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2">
             <label className="font-bold text-sm uppercase tracking-widest text-gray-600">Limit Price (SUI)</label>
             <div className="flex bg-white border-[3px] border-black h-12 shadow-[4px_4px_0px_#000]">
               <button onClick={() => setOrderPrice(Number(Math.max(0.01, orderPrice - 0.01).toFixed(4)))} className="w-12 border-r-[3px] border-black font-black text-xl hover:bg-gray-200 active:bg-gray-300">-</button>
@@ -82,8 +78,7 @@ export function TradeForm({ isWalletConnected, activeTab, setActiveTab, onExecut
           </div>
         </div>
 
-        {/* Order Summary */}
-        <div className="flex flex-col gap-2 border-t-[4px] border-black border-dashed pt-4 mt-auto">
+                <div className="flex flex-col gap-2 border-t-[4px] border-black border-dashed pt-4 mt-auto">
           <div className="flex justify-between items-center text-sm font-bold">
             <span className="text-gray-500 uppercase tracking-widest">Order Value</span>
             <span className="font-mono text-lg">{orderValue.toFixed(2)} SUI</span>
@@ -119,8 +114,7 @@ export function TradeForm({ isWalletConnected, activeTab, setActiveTab, onExecut
         </div>
       </div>
 
-      {/* Action Button */}
-      <div className="p-6 border-t-[4px] border-black bg-white shrink-0 z-20">
+            <div className="p-6 border-t-[4px] border-black bg-white shrink-0 z-20">
         <button
           disabled={!isWalletConnected || isSubmitting || insufficientFunds}
           onClick={handleSubmit}

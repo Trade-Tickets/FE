@@ -15,7 +15,6 @@ export function OrderBook({ eventId, selectedClass, currentStat, orders, isProfi
   const userBids = openOrders.filter(o => o.type === 'buy');
   const userAsks = openOrders.filter(o => o.type === 'sell');
 
-  // Build bids map
   const bidsMap = new Map<number, { vol: number; isUser: boolean }>();
   for (let i = 0; i < 15; i++) {
     const p = parseFloat((basePrice - (i * 0.2)).toFixed(2));
@@ -29,7 +28,6 @@ export function OrderBook({ eventId, selectedClass, currentStat, orders, isProfi
   });
   const finalBids = Array.from(bidsMap.entries()).map(([price, data]) => ({ price, ...data })).sort((a, b) => b.price - a.price);
 
-  // Build asks map
   const asksMap = new Map<number, { vol: number; isUser: boolean }>();
   for (let i = 0; i < 15; i++) {
     const p = parseFloat((basePrice + (i * 0.2) + 0.1).toFixed(2));
@@ -57,8 +55,7 @@ export function OrderBook({ eventId, selectedClass, currentStat, orders, isProfi
         <span className="w-[25%] text-right">Vol</span>
       </div>
 
-      {/* Mark Price */}
-      <div className="text-center font-black text-lg py-2 flex items-center justify-between px-4 bg-brand-bg border-b-[2px] border-black shadow-[0_2px_0_rgba(0,0,0,0.1)] truncate">
+            <div className="text-center font-black text-lg py-2 flex items-center justify-between px-4 bg-brand-bg border-b-[2px] border-black shadow-[0_2px_0_rgba(0,0,0,0.1)] truncate">
         <span className="text-xs uppercase text-gray-500 font-bold tracking-widest">Mark Price</span>
         <div className="flex items-center gap-2">
           {basePrice.toFixed(2)} SUI
@@ -66,8 +63,7 @@ export function OrderBook({ eventId, selectedClass, currentStat, orders, isProfi
         </div>
       </div>
 
-      {/* Rows */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col p-2 gap-[2px] bg-white">
+            <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col p-2 gap-[2px] bg-white">
         {Array.from({ length: displayRows }).map((_, i) => {
           const bid = finalBids[i];
           const ask = finalAsks[i];

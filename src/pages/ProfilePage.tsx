@@ -20,18 +20,16 @@ export function ProfilePage() {
     { enabled: !!walletAddress, refetchInterval: 10000 }
   );
 
-  // Fetch wallet profile from BE on mount (and when wallet changes)
   useEffect(() => {
     if (!walletAddress) return;
     fetchWalletProfile(walletAddress)
       .then(setWalletProfile)
-      .catch(() => setWalletProfile(null)); // BE offline → null, use local fallback
+      .catch(() => setWalletProfile(null));
   }, [walletAddress]);
 
   const suiCash = balanceData ? (Number(balanceData.totalBalance) / 1e9).toFixed(2) : '0.00';
   const portfolioSui = userOwnedTickets.reduce((sum, ticket) => sum + ticket.priceSui, 0).toFixed(2);
 
-  // Compute PnL from local filled orders (buy cost vs sell proceeds)
   const filledOrders = orders.filter(o => o.status === 'filled');
   const totalBought = filledOrders.filter(o => o.type === 'buy').reduce((s, o) => s + o.priceSui * o.quantity, 0);
   const totalSold   = filledOrders.filter(o => o.type === 'sell').reduce((s, o) => s + o.priceSui * o.quantity, 0);
@@ -62,8 +60,7 @@ export function ProfilePage() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Page Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b-[4px] border-black pb-6 mb-8">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b-[4px] border-black pb-6 mb-8">
           <div>
             <h1 className="text-5xl md:text-6xl font-black uppercase tracking-tighter mix-blend-hard-light mb-2">
               My Profile
@@ -81,26 +78,23 @@ export function ProfilePage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column: Stats */}
-          <div className="lg:col-span-1 flex flex-col gap-8">
+                    <div className="lg:col-span-1 flex flex-col gap-8">
             <ProfileStats
               walletAddress={walletAddress}
               suiCash={suiCash}
               portfolioSui={portfolioSui}
               totalPnL={totalPnL}
               isTotalProfit={isTotalProfit}
-              // BE wallet profile stats (may be null if offline)
+
               totalTrades={walletProfile?.totalTrades ?? filledOrders.length}
               totalBuyVolume={walletProfile?.totalBuyVolume ?? totalBought}
               totalSellVolume={walletProfile?.totalSellVolume ?? totalSold}
             />
 
-            {/* Trading Journey Chart */}
-            <ProfileChart />
+                        <ProfileChart />
           </div>
 
-          {/* Right Column: Trade History */}
-          <div className="lg:col-span-2 flex flex-col gap-8">
+                    <div className="lg:col-span-2 flex flex-col gap-8">
             <ProfileTradeHistory walletAddress={walletAddress} />
           </div>
         </div>

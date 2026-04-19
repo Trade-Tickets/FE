@@ -8,7 +8,6 @@ interface RecentTradesProps {
 export function RecentTrades({ trades }: RecentTradesProps) {
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to top when new trades arrive (newest on top)
   useEffect(() => {
     if (listRef.current) {
       listRef.current.scrollTop = 0;
@@ -28,7 +27,7 @@ export function RecentTrades({ trades }: RecentTradesProps) {
       </div>
       <div ref={listRef} className="flex-1 overflow-y-auto custom-scrollbar flex flex-col p-2 gap-[2px] bg-white">
         {trades.map((trade, i) => {
-        // B = Buy = green, S = Sell = red
+
           const isMua = trade.side === 'B';
           const isNew = i === 0;
           return (

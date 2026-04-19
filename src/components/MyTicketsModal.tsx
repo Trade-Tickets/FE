@@ -30,8 +30,7 @@ export function MyTicketsModal() {
             exit={{ scale: 0.9, y: 20 }}
             className="w-full max-w-4xl bg-brand-bg border-[4px] border-black shadow-[16px_16px_0px_#000] overflow-hidden flex flex-col h-[80vh] relative"
           >
-            {/* Header */}
-            <div className="p-6 md:p-8 bg-brand-green border-b-[4px] border-black flex justify-between items-center z-10 shrink-0">
+                        <div className="p-6 md:p-8 bg-brand-green border-b-[4px] border-black flex justify-between items-center z-10 shrink-0">
                <div>
                  <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-black">My Vault</h2>
                  <p className="font-bold text-lg mt-1 border-[2px] border-black bg-white inline-block px-3 shadow-[2px_2px_0px_#000]">
@@ -46,8 +45,7 @@ export function MyTicketsModal() {
                </button>
             </div>
 
-            {/* Content Body */}
-            <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+                        <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
               {userOwnedTickets.length === 0 ? (
                  <div className="w-full h-full flex flex-col items-center justify-center bg-white border-[4px] border-black border-dashed opacity-80">
                    <span className="text-8xl mb-6">🪹</span>
@@ -65,8 +63,7 @@ export function MyTicketsModal() {
                    {userOwnedTickets.map((ticket, idx) => {
                      const event = getEventForTicket(ticket.eventId);
                      const isTradingLive = event?.tradingStatus === 'Live';
-                     
-                     // PnL Calculation
+
                      const marketStat = event?.marketStats.find(s => s.ticketClass === ticket.ticketClass);
                      const currentFloor = marketStat?.floorPrice ?? ticket.priceSui;
                      const pnl = currentFloor - ticket.priceSui;
@@ -81,13 +78,13 @@ export function MyTicketsModal() {
                                <QrCode size={20} strokeWidth={3} />
                              </div>
                           </div>
-                          
+
                           <div className="p-6 flex flex-col gap-4">
                              <div>
                                <p className="text-xs uppercase font-extrabold text-gray-500">Event</p>
                                <h4 className="text-2xl font-black uppercase leading-tight line-clamp-2">{event?.title}</h4>
                              </div>
-                             
+
                              <div className="flex flex-col gap-2 border-t-[3px] border-black border-dashed pt-4 mt-2">
                                 <div className="flex justify-between items-end">
                                    <div>
@@ -100,8 +97,7 @@ export function MyTicketsModal() {
                                    </div>
                                 </div>
 
-                                {/* Floating PnL Container */}
-                                {isTradingLive && (
+                                                                {isTradingLive && (
                                    <div className={`mt-2 flex justify-between items-center px-3 py-2 border-[2px] border-black font-bold ${isProfit ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                       <span className="text-xs uppercase tracking-widest">Curr. Floor: {currentFloor} SUI</span>
                                       <div className="flex items-center gap-1">
@@ -110,7 +106,7 @@ export function MyTicketsModal() {
                                       </div>
                                    </div>
                                 )}
-                                
+
                                 <div className="flex gap-2 mt-2">
                                   <button className="flex-1 bg-brand-yellow text-black py-2 border-[3px] border-black font-black uppercase text-sm shadow-[2px_2px_0px_#000] active:translate-y-1 active:translate-x-1 active:shadow-none text-center">
                                     View QR
@@ -125,9 +121,8 @@ export function MyTicketsModal() {
                                 </div>
                              </div>
                           </div>
-                          
-                          {/* Notches */}
-                          <div className="w-6 h-6 border-r-[4px] border-black bg-brand-bg rounded-r-full absolute top-[52px] -left-1"></div>
+
+                                                    <div className="w-6 h-6 border-r-[4px] border-black bg-brand-bg rounded-r-full absolute top-[52px] -left-1"></div>
                           <div className="w-6 h-6 border-l-[4px] border-black bg-brand-bg rounded-l-full absolute top-[52px] -right-1"></div>
                         </div>
                      );

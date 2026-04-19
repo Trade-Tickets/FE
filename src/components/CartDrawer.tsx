@@ -18,15 +18,14 @@ export function CartDrawer({ onCheckout }: CartDrawerProps) {
     fetchEvents().then(setEvents);
   }, []);
 
-  // Group cart items by event to show nice details
   const getEventForTicket = (eventId: string) => events.find(e => e.id === eventId);
-  
+
   const totalPrice = cart.reduce((sum, t) => sum + t.priceSui, 0);
 
   const handleCheckoutClick = () => {
     setIsProcessing(true);
     onCheckout();
-    // Simulate short delay then let global checkout flow handle success
+
     setTimeout(() => {
       setIsProcessing(false);
     }, 1000);
@@ -36,25 +35,22 @@ export function CartDrawer({ onCheckout }: CartDrawerProps) {
     <AnimatePresence>
       {isCartOpen && (
         <>
-          {/* Backdrop */}
-          <motion.div
+                    <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setCartOpen(false)}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
           />
-          
-          {/* Side Drawer */}
-          <motion.div
+
+                    <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-brand-bg border-l-[4px] border-black shadow-[-16px_0px_0px_rgba(0,0,0,1)] z-50 flex flex-col"
           >
-            {/* Header */}
-            <div className="p-6 bg-brand-purple border-b-[4px] border-black flex justify-between items-center shrink-0">
+                        <div className="p-6 bg-brand-purple border-b-[4px] border-black flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3 text-white">
                 <TicketIcon size={32} strokeWidth={3} />
                 <h2 className="text-3xl font-black uppercase tracking-widest text-stroke-white" style={{ WebkitTextStroke: '1px black', textShadow: '2px 2px 0 #000'}}>Cart</h2>
@@ -67,8 +63,7 @@ export function CartDrawer({ onCheckout }: CartDrawerProps) {
               </button>
             </div>
 
-            {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4 custom-scrollbar">
+                        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4 custom-scrollbar">
               {cart.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center opacity-50">
                   <span className="text-6xl mb-4">🛒</span>
@@ -98,7 +93,7 @@ export function CartDrawer({ onCheckout }: CartDrawerProps) {
                           <Trash2 size={16} color="white" strokeWidth={3} />
                         </button>
                       </div>
-                      
+
                       <div className="flex justify-between items-end border-t-[3px] border-black border-dashed pt-3 mt-1">
                         <span className="font-mono text-sm font-bold tracking-widest uppercase">ID: {ticket.id}</span>
                         <span className="bg-brand-yellow px-3 py-1 border-[3px] border-black font-black text-lg shadow-[2px_2px_0px_#000]">
@@ -111,13 +106,12 @@ export function CartDrawer({ onCheckout }: CartDrawerProps) {
               )}
             </div>
 
-            {/* Footer Checkout */}
-            <div className="p-6 bg-white border-t-[4px] border-black flex flex-col gap-4 shrink-0">
+                        <div className="p-6 bg-white border-t-[4px] border-black flex flex-col gap-4 shrink-0">
               <div className="flex justify-between items-center px-4 py-3 bg-brand-bg border-[3px] border-black shadow-[4px_4px_0px_#000]">
                 <span className="font-black uppercase text-xl text-gray-600">Total</span>
                 <span className="font-black text-3xl">{totalPrice} SUI</span>
               </div>
-              
+
               <button
                 disabled={cart.length === 0 || !isWalletConnected || isProcessing}
                 onClick={handleCheckoutClick}

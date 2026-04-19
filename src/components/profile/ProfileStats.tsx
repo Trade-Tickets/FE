@@ -6,7 +6,7 @@ interface ProfileStatsProps {
   portfolioSui: string;
   totalPnL: string;
   isTotalProfit: boolean;
-  // From BE wallet profile
+
   totalTrades?: number;
   totalBuyVolume?: number;
   totalSellVolume?: number;
@@ -28,8 +28,7 @@ export function ProfileStats({
 
   return (
     <div className="bg-white border-[4px] border-black shadow-[8px_8px_0px_#000] p-6">
-      {/* Wallet identity */}
-      <div className="flex items-center gap-3 mb-6 border-b-[4px] border-black pb-4">
+            <div className="flex items-center gap-3 mb-6 border-b-[4px] border-black pb-4">
         <div className="w-12 h-12 rounded-full bg-brand-purple border-[3px] border-black flex items-center justify-center shadow-[2px_2px_0px_#000]">
           <User size={24} className="text-white" />
         </div>
@@ -40,16 +39,14 @@ export function ProfileStats({
       </div>
 
       <div className="flex flex-col gap-3">
-        {/* Cash balance */}
-        <div className="bg-blue-50 border-[3px] border-black p-4 flex justify-between items-center">
+                <div className="bg-blue-50 border-[3px] border-black p-4 flex justify-between items-center">
           <div className="flex items-center gap-2 font-black uppercase text-sm">
             <Coins size={18} /> Cash Balance
           </div>
           <span className="font-mono font-black text-xl">{suiCash} SUI</span>
         </div>
 
-        {/* Portfolio value */}
-        <div className="bg-green-50 border-[3px] border-black p-4 flex justify-between items-center">
+                <div className="bg-green-50 border-[3px] border-black p-4 flex justify-between items-center">
           <div className="flex flex-col gap-0.5">
             <span className="font-black uppercase text-sm">Portfolio</span>
             <span className="text-[10px] font-bold text-gray-500 uppercase">Estimated Value</span>
@@ -57,8 +54,7 @@ export function ProfileStats({
           <span className="font-mono font-black text-xl text-brand-green">{portfolioSui} SUI</span>
         </div>
 
-        {/* PnL */}
-        <div className={`border-[3px] border-black p-4 flex justify-between items-center ${isTotalProfit ? 'bg-[#dcfce7]' : 'bg-[#fee2e2]'}`}>
+                <div className={`border-[3px] border-black p-4 flex justify-between items-center ${isTotalProfit ? 'bg-[#dcfce7]' : 'bg-[#fee2e2]'}`}>
           <span className="font-black uppercase text-sm">Total PnL</span>
           <div className="flex items-center gap-2">
             <span className={`font-mono font-black text-xl ${isTotalProfit ? 'text-green-600' : 'text-red-600'}`}>
@@ -68,8 +64,7 @@ export function ProfileStats({
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="border-t-[3px] border-black border-dashed pt-3 mt-1">
+                <div className="border-t-[3px] border-black border-dashed pt-3 mt-1">
           <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Trade Statistics (BE)</p>
 
           <div className="flex flex-col gap-2">

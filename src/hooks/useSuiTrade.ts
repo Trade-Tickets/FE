@@ -1,12 +1,8 @@
-// ========================================
-// useSuiTrade - On-chain trade execution hook
-// ========================================
 
 import { useSignAndExecuteTransaction, useSuiClient } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
 import { PLATFORM_FEE_RATE, SELL_TAX_RATE } from '../types';
 
-// Platform treasury wallet — replace with your real platform address
 const PLATFORM_ADDRESS = '0x6300b89eb6922d169bf4f632e08de41b63905b3c5e3ccca06ee2a441768400cf';
 
 const APP_NETWORK = (import.meta.env.VITE_SUI_NETWORK || 'testnet').toLowerCase();
@@ -40,7 +36,7 @@ export function useSuiTrade() {
     const totalMist = BigInt(Math.round(totalCost * 1_000_000_000));
 
     const tx = new Transaction();
-    // DO NOT set sender manually; wallet sets it during signing.
+
     const [coin] = tx.splitCoins(tx.gas, [totalMist]);
     tx.transferObjects([coin], PLATFORM_ADDRESS);
     tx.setGasBudget(10_000_000);

@@ -35,12 +35,11 @@ export function ProfileTradeHistory({ walletAddress }: ProfileTradeHistoryProps)
     loadTrades();
   }, [walletAddress]);
 
-  // Fallback: use local orders from zustand store if BE is offline
   const localOrders = orders.filter(o => o.status === 'filled');
 
   const displayTrades = !error && trades.length > 0
     ? trades
-    : null; // null = use fallback
+    : null;
 
   const hasFallback = localOrders.length > 0;
 
@@ -53,8 +52,7 @@ export function ProfileTradeHistory({ walletAddress }: ProfileTradeHistoryProps)
 
   return (
     <div className="bg-white border-[4px] border-black shadow-[8px_8px_0px_#000] p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+            <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div className="flex items-center gap-2 font-black uppercase text-xl">
           <Clock size={24} /> Trade History
           {!error && trades.length > 0 && (
@@ -72,8 +70,7 @@ export function ProfileTradeHistory({ walletAddress }: ProfileTradeHistoryProps)
         </button>
       </div>
 
-      {/* Offline notice */}
-      {error && hasFallback && (
+            {error && hasFallback && (
         <div className="flex items-center gap-2 bg-yellow-50 border-[2px] border-yellow-400 p-3 mb-4 text-sm font-bold text-yellow-700">
           <AlertCircle size={16} />
           Backend offline — displaying local data
@@ -101,8 +98,7 @@ export function ProfileTradeHistory({ walletAddress }: ProfileTradeHistoryProps)
       {!loading && (paginated.length > 0 ? (
         <>
           <div className="border-[3px] border-black overflow-hidden">
-            {/* Table Header */}
-            <div className="flex bg-gray-100 border-b-[2px] border-black p-3 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                        <div className="flex bg-gray-100 border-b-[2px] border-black p-3 text-[10px] font-black text-gray-500 uppercase tracking-widest">
               <div className="flex-1">Event / Ticket Class</div>
               <div className="w-16 text-center">Type</div>
               <div className="w-20 text-right">Price</div>
@@ -111,10 +107,9 @@ export function ProfileTradeHistory({ walletAddress }: ProfileTradeHistoryProps)
               <div className="w-28 text-right text-[9px]">Time</div>
             </div>
 
-            {/* Rows */}
-            <div className="divide-y-[1px] divide-gray-100 flex flex-col">
+                        <div className="divide-y-[1px] divide-gray-100 flex flex-col">
               {paginated.map((item, i) => {
-                // Handle both BE TradeRecord and local Order formats
+
                 const isBERecord = 'tradeType' in item;
                 const tradeType = isBERecord ? (item as TradeRecord).tradeType : (item as typeof localOrders[0]).type;
                 const isBuy = tradeType === 'buy';
@@ -168,8 +163,7 @@ export function ProfileTradeHistory({ walletAddress }: ProfileTradeHistoryProps)
             </div>
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
+                    {totalPages > 1 && (
             <div className="flex flex-col items-center gap-3 mt-6 w-full">
               <Pagination 
                 currentPage={page} 

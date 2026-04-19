@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ThumbsUp, CornerDownRight, Send, MessageSquare } from 'lucide-react';
 import type { Comment } from '../../types';
 
-// --- Recursive CommentNode ---
 function CommentNode({ comment, depth = 0, onReply, onLike }: {
   comment: Comment;
   depth?: number;
@@ -96,7 +95,6 @@ function CommentNode({ comment, depth = 0, onReply, onLike }: {
   );
 }
 
-// --- Main Discussion Section ---
 interface DiscussionSectionProps {
   comments: Comment[];
   totalCount: number;
@@ -117,8 +115,7 @@ export function DiscussionSection({ comments, totalCount, newCommentText, onNewC
         <span className="font-bold border-[2px] border-black px-2 py-0.5 bg-brand-yellow text-xs neo-box uppercase">{totalCount} Comments</span>
       </div>
 
-      {/* Add Comment Input */}
-      <div className="flex gap-3 mb-8">
+            <div className="flex gap-3 mb-8">
         <div className="w-10 h-10 border-[3px] border-black rounded-full bg-brand-pink flex items-center justify-center shrink-0">
           <span className="font-black text-xs">YOU</span>
         </div>
@@ -138,8 +135,7 @@ export function DiscussionSection({ comments, totalCount, newCommentText, onNewC
         </div>
       </div>
 
-      {/* Comment Threads */}
-      <div className="flex flex-col">
+            <div className="flex flex-col">
         {comments.map(comment => (
           <CommentNode key={comment.id} comment={comment} onReply={onReply} onLike={onLike} />
         ))}

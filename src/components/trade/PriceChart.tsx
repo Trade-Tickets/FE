@@ -13,7 +13,6 @@ interface PriceChartProps {
   isProfit: boolean;
 }
 
-// ── Custom Tooltip ─────────────────────────────────────────────────────────────
 interface TooltipProps {
   active?: boolean;
   payload?: { value: number; payload: { time: string; price: number; volume: number } }[];
@@ -47,7 +46,6 @@ function LineTooltip({ active, payload }: TooltipProps) {
   );
 }
 
-// ── Custom Dot (only the latest point) ────────────────────────────────────────
 interface DotProps {
   cx?: number;
   cy?: number;
@@ -65,14 +63,12 @@ function ActiveDot({ cx = 0, cy = 0, color }: DotProps) {
   );
 }
 
-// ── Main Chart ─────────────────────────────────────────────────────────────────
 export function PriceChart({ eventTitle, selectedClass, candles, currentPrice, isProfit }: PriceChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const color = isProfit ? '#22c55e' : '#ef4444';
   const colorDark = isProfit ? '#16a34a' : '#dc2626';
 
-  // Map candles → simple {time, price, volume} for the line chart
   const chartData = useMemo(() =>
     candles.map(c => ({
       time: c.time,
@@ -86,7 +82,6 @@ export function PriceChart({ eventTitle, selectedClass, candles, currentPrice, i
   const maxP = Math.max(...prices, currentPrice);
   const pad = (maxP - minP) * 0.12 || 0.05;
 
-  // Auto-scroll to right when new data arrives
   useEffect(() => {
     const el = containerRef.current?.querySelector('.recharts-wrapper');
     if (el) el.scrollLeft = el.scrollWidth;
@@ -94,13 +89,11 @@ export function PriceChart({ eventTitle, selectedClass, candles, currentPrice, i
 
   return (
     <div ref={containerRef} className="h-[45%] flex-shrink-0 p-4 relative border-b-[4px] border-black bg-white">
-      {/* Chart title */}
-      <p className="absolute top-3 left-5 font-mono font-bold text-gray-400 z-10 text-sm opacity-60 uppercase tracking-widest pointer-events-none">
+            <p className="absolute top-3 left-5 font-mono font-bold text-gray-400 z-10 text-sm opacity-60 uppercase tracking-widest pointer-events-none">
         {eventTitle} · {selectedClass}
       </p>
 
-      {/* Current price badge */}
-      <div
+            <div
         className="absolute top-3 right-6 z-10 px-2 py-0.5 border-[2px] border-black font-mono font-black text-sm shadow-[2px_2px_0_#000]"
         style={{ backgroundColor: color, color: isProfit ? '#000' : '#fff' }}
       >
@@ -146,8 +139,7 @@ export function PriceChart({ eventTitle, selectedClass, candles, currentPrice, i
 
           <Tooltip content={<LineTooltip />} cursor={{ stroke: '#00000033', strokeWidth: 1, strokeDasharray: '4 3' }} />
 
-          {/* Dashed reference at current price */}
-          <ReferenceLine
+                    <ReferenceLine
             y={currentPrice}
             stroke={colorDark}
             strokeDasharray="5 3"
@@ -155,8 +147,7 @@ export function PriceChart({ eventTitle, selectedClass, candles, currentPrice, i
             strokeOpacity={0.7}
           />
 
-          {/* Main price line with area fill */}
-          <Area
+                    <Area
             type="monotone"
             dataKey="price"
             stroke={color}

@@ -1,8 +1,8 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationProps {
-  currentPage: number; // 0-indexed
-  totalPages: number; // For rendering numbers
+  currentPage: number;
+  totalPages: number;
   onPageChange: (page: number) => void;
 }
 

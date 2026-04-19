@@ -1,8 +1,4 @@
-// ========================================
-// Centralized Type Definitions
-// ========================================
 
-// --- Ticket Types ---
 export type TicketStatus = 'available' | 'sold' | 'listing';
 export type TicketClass = 'VIP' | 'Regular' | 'Early Bird' | 'Online Standard' | 'In-Person Pass' | 'Hacker Pass' | 'Gallery Entry' | 'Investor Pass' | string;
 
@@ -14,7 +10,6 @@ export interface Ticket {
   status: TicketStatus;
 }
 
-// --- Market Types ---
 export interface MarketStat {
   ticketClass: TicketClass;
   originalPrice: number;
@@ -24,7 +19,6 @@ export interface MarketStat {
   priceHistory: { time: string; price: number }[];
 }
 
-// --- Event Types ---
 export interface Event {
   id: string;
   title: string;
@@ -42,13 +36,11 @@ export interface Event {
   marketStats: MarketStat[];
 }
 
-// --- Order Types ---
 export type OrderType = 'buy' | 'sell';
 export type OrderStatus = 'open' | 'filled' | 'cancelled' | 'expired';
 
-// Fee constants
-export const PLATFORM_FEE_RATE = 0.001; // 0.1%
-export const SELL_TAX_RATE = 0.005;     // 0.5%
+export const PLATFORM_FEE_RATE = 0.001;
+export const SELL_TAX_RATE = 0.005;
 
 export interface Order {
   id: string;
@@ -61,19 +53,17 @@ export interface Order {
   createdAt: number;
   expiresAt: number;
   avgBuyPrice?: number;
-  platformFee?: number;  // 0.1% on both buy/sell
-  sellTax?: number;      // 0.5% on sell only
-  totalCost?: number;    // total after fees
+  platformFee?: number;
+  sellTax?: number;
+  totalCost?: number;
 }
 
-// --- Notification Types ---
 export interface NotificationItem {
   id: string;
   message: string;
   type: 'success' | 'error' | 'info';
 }
 
-// --- Comment Types ---
 export interface Comment {
   id: string;
   author: string;

@@ -17,7 +17,6 @@ export function Dashboard() {
 
   const getEventForTicket = (eventId: string) => events.find(e => e.id === eventId);
 
-  // Aggregate tickets by eventId and ticketClass
   const groupedVault = userOwnedTickets.reduce((acc, ticket) => {
     const key = `${ticket.eventId}-${ticket.ticketClass}`;
     if (!acc[key]) {
@@ -37,7 +36,6 @@ export function Dashboard() {
 
   const aggregatedTickets = Object.values(groupedVault);
 
-  // Account Overview Calc
   const totalInvested = aggregatedTickets.reduce((acc, g) => acc + g.totalSpend, 0);
   const currentEstValue = aggregatedTickets.reduce((acc, g) => {
     const event = getEventForTicket(g.eventId);
@@ -49,8 +47,7 @@ export function Dashboard() {
 
   return (
     <div className="pt-8 pb-20 px-4 md:px-8 max-w-7xl mx-auto flex flex-col gap-8 min-h-[80vh]">
-      {/* Account Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
          <div className="bg-brand-purple p-6 border-[4px] border-black shadow-[6px_6px_0px_#000] hover:translate-x-1 hover:translate-y-1 transition-transform">
             <p className="font-black uppercase tracking-widest text-sm mb-2">Total Est. Value</p>
             <h2 className="text-4xl font-black">{currentEstValue.toFixed(2)} SUI</h2>
@@ -77,7 +74,7 @@ export function Dashboard() {
             Asset Portfolio & Trade History
           </p>
         </div>
-        
+
         <div className="flex bg-white border-[4px] border-black shadow-[6px_6px_0px_#000] overflow-hidden">
           <button 
             onClick={() => setActiveTab('vault')}
@@ -115,11 +112,11 @@ export function Dashboard() {
               {aggregatedTickets.map((group, idx) => {
                 const event = getEventForTicket(group.eventId);
                 const isTradingLive = event?.tradingStatus === 'Live';
-                
+
                 const avgEntryPrice = group.totalSpend / group.count;
                 const marketStat = event?.marketStats.find(s => s.ticketClass === group.ticketClass);
                 const currentFloor = marketStat?.floorPrice ?? avgEntryPrice;
-                
+
                 const pnl = currentFloor - avgEntryPrice;
                 const pnlPercent = (pnl / avgEntryPrice) * 100;
                 const isProfit = pnl >= 0;
@@ -132,13 +129,13 @@ export function Dashboard() {
                           x{group.count}
                         </div>
                     </div>
-                    
+
                     <div className="p-6 flex flex-col gap-4">
                         <div>
                           <p className="text-xs uppercase font-extrabold text-gray-500">Asset</p>
                           <h4 className="text-2xl font-black uppercase leading-tight line-clamp-2">{event?.title}</h4>
                         </div>
-                        
+
                         <div className="flex flex-col gap-2 border-t-[3px] border-black border-dashed pt-4 mt-2">
                           <div className="flex justify-between items-end">
                               <div>
@@ -160,7 +157,7 @@ export function Dashboard() {
                                 </div>
                               </div>
                           )}
-                          
+
                           <div className="flex gap-2 mt-4">
                             <button className="flex-1 bg-brand-yellow text-black py-3 border-[3px] border-black font-black uppercase text-sm shadow-[4px_4px_0px_#000] active:translate-y-1 active:translate-x-1 active:shadow-none text-center transition-all">
                               View QR
@@ -297,7 +294,7 @@ export function Dashboard() {
                     const event = getEventForTicket(order.eventId);
                     const avgEntryPrice = (order as any).avgBuyPrice || 0;
                     const sellPrice = order.priceSui;
-                    
+
                     const pnl = sellPrice - avgEntryPrice;
                     const totalPnl = pnl * order.quantity;
                     const isProfit = pnl > 0;

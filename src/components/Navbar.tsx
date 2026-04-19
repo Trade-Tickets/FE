@@ -1,31 +1,19 @@
 import { useAppStore } from '../store';
 import { ConnectModal, useSuiClientQuery } from '@mysten/dapp-kit';
 import { Wallet, Loader2, Ticket as TicketIcon, Grid, User, Bell } from 'lucide-react';
-
 export function Navbar() {
   const { isWalletConnected, walletAddress, userOwnedTickets, cart, setCartOpen, activePage, setActivePage } = useAppStore();
-  // removed dropdown ref as we no longer use dropdown
-
-  // Để đổi sang USDC, bạn chỉ cần truyền thêm `coinType` vào API getBalance.
-  // Ví dụ USDC trên Testnet:
-  // const USDC_COIN_TYPE = '0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC';
-  
   const { data: balanceData } = useSuiClientQuery(
     'getBalance',
     { 
       owner: walletAddress!,
-      // Mở comment dòng dưới đây để fetch USDC thay vì SUI mặc định (0x2::sui::SUI)
-      // coinType: USDC_COIN_TYPE 
     },
     { enabled: !!walletAddress, refetchInterval: 10000 }
   );
-
   const suiCash = balanceData ? (Number(balanceData.totalBalance) / 1e9).toFixed(2) : '0.00';
   const portfolioSui = userOwnedTickets.reduce((sum, ticket) => sum + ticket.priceSui, 0).toFixed(2);
-
   return (
     <nav className="flex items-center justify-between p-6 border-b-[4px] border-black bg-brand-bg sticky top-0 z-40">
-      {/* Logo */}
       <div className="flex items-center cursor-pointer ml-4 gap-3 group" onClick={() => setActivePage('landing')}>
         <div className="w-14 h-14 border-[3px] border-black bg-white shadow-[4px_4px_0px_#000] rounded-lg flex items-center justify-center overflow-hidden transition-transform group-hover:-rotate-3">
           <img
@@ -35,7 +23,6 @@ export function Navbar() {
             referrerPolicy="no-referrer"
           />
         </div>
-
         <div className="flex items-center">
           <div className="w-8 h-8 bg-brand-green border-[3px] border-black flex items-center justify-center text-black font-black text-xl neo-box rotate-[-6deg]">
             F
@@ -49,7 +36,6 @@ export function Navbar() {
           <div className="w-8 h-8 bg-brand-pink border-[3px] border-black flex items-center justify-center text-black font-black text-xl neo-box -ml-1">
             R
           </div>
-
           <div className="flex flex-col ml-3">
             <span className="text-3xl font-black uppercase leading-none tracking-tighter">TICKET</span>
             <div className="bg-black text-white text-[10px] font-bold px-2 py-0.5 transform -skew-x-[12deg] w-fit">
@@ -58,8 +44,6 @@ export function Navbar() {
           </div>
         </div>
       </div>
-
-      {/* Navigation Links */}
       <div className="hidden lg:flex gap-8 font-bold text-sm tracking-widest text-black">
         <button
           onClick={() => setActivePage('markets')}
@@ -76,10 +60,7 @@ export function Navbar() {
           </button>
         )}
       </div>
-
-      {/* Right Side Actions */}
       <div className="flex items-center gap-4">
-        {/* Cart Icon */}
         <div
           onClick={() => setCartOpen(true)}
           className="relative p-2 bg-brand-yellow border-[3px] border-black neo-btn rounded-full cursor-pointer hover:bg-brand-yellow-dark transition-colors text-black"
@@ -91,8 +72,6 @@ export function Navbar() {
             </span>
           )}
         </div>
-
-        {/* Dashboard Button */}
         {isWalletConnected && (
           <button
             onClick={() => setActivePage('dashboard')}
@@ -102,11 +81,8 @@ export function Navbar() {
             My Dashboard
           </button>
         )}
-
-        {/* Connect Wallet / Account */}
         {isWalletConnected ? (
           <div className="flex items-center gap-6">
-            {/* Portfolio & Cash Stats */}
             <div className="hidden lg:flex items-center gap-6 border-r-[2px] border-gray-300 pr-6">
               <div className="flex flex-col items-start gap-0.5">
                 <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest whitespace-nowrap">Portfolio</span>
@@ -117,8 +93,6 @@ export function Navbar() {
                 <span className="text-[17px] font-black text-blue-600 whitespace-nowrap">{suiCash} SUI</span>
               </div>
             </div>
-
-            {/* Actions */}
             <div className="flex items-center gap-5 relative">
               <button
                 onClick={() => useAppStore.getState().addNotification('Deposit modal opened', 'info')}
@@ -126,12 +100,10 @@ export function Navbar() {
               >
                 Deposit
               </button>
-
               <button className="relative p-1 hover:opacity-70 transition-opacity">
                 <div className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border-2 border-white z-10"></div>
                 <Bell size={26} strokeWidth={2.5} className="text-gray-700" />
               </button>
-
               <button
                 onClick={() => setActivePage('profile')}
                 className={`w-[42px] h-[42px] rounded-full sm:ml-2 border-[3px] border-black shadow-[2px_2px_0px_#000] flex items-center justify-center hover:scale-105 transition-transform cursor-pointer ${activePage === 'profile' ? 'bg-black text-white' : 'bg-gradient-to-br from-[#f8bb46] to-[#fc5d4c] text-white'}`}

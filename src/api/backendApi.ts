@@ -2,11 +2,11 @@ import type { Comment, Event, Ticket } from '../types';
 
 const API_BASE_URL = (() => {
   const explicitUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
-  // If a non-empty URL is explicitly set, use it (production deployments)
+
   if (explicitUrl && explicitUrl.trim().length > 0) {
     return explicitUrl.replace(/\/$/, '');
   }
-  // Default: empty string → relative URL → goes through Vite proxy in dev
+
   return '';
 })();
 
@@ -63,8 +63,6 @@ export async function fetchFloorPrice(eventId: string, ticketClass: string): Pro
   );
   return result.floorPrice;
 }
-
-// ── Wallet / Trade History ─────────────────────────────────────────────────────
 
 export interface TradeRecord {
   id: string;

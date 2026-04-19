@@ -111,7 +111,7 @@ export interface RecordTradePayload {
   platformFee: number;
   sellTax: number;
   suiTxDigest?: string;
-  status: 'filled' | 'open' | 'cancelled';
+  status: 'filled' | 'open' | 'cancelled' | 'expired';
 }
 
 export async function recordTrade(payload: RecordTradePayload): Promise<TradeRecord> {

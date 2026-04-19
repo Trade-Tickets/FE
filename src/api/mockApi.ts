@@ -173,7 +173,7 @@ const COMMENTS_DATA: Record<string, Comment[]> = {
   ]
 };
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => Promise.resolve();
 
 export async function fetchEvents(): Promise<Event[]> {
   await delay(300);

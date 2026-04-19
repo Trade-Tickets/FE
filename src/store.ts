@@ -177,13 +177,14 @@ export const useAppStore = create<AppState>((set, get) => ({
             orders: updatedOrders,
             userOwnedTickets: updatedTickets
           };
-        });
+        }); // end set
+
+        resolve();
 
         if (filledOrder && get().walletAddress) {
           const walletAddress = get().walletAddress!;
           try {
             await recordTrade({
-              id: order.id,
               walletAddress,
               eventId: order.eventId,
               eventTitle: `Event ${order.eventId}`,
@@ -200,9 +201,7 @@ export const useAppStore = create<AppState>((set, get) => ({
             get().addNotification('⚠️ Saved local, BE sync failed', 'error');
           }
         }
-
-        resolve();
-      }, 800);
+      }, 0);
     });
   },
 
@@ -278,7 +277,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           isCartOpen: false
         }));
         resolve(true);
-      }, 2000);
+      }, 0);
     });
   }
 }));
